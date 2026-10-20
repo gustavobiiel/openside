@@ -1,0 +1,1243 @@
+/*
+ * Ajustes visuais do Modo Fury sobre o tema Astryx.
+ *
+ * No AppShell "elevated", o fundo elevado da área de conteúdo arredonda
+ * apenas o canto superior esquerdo. Arredonda também o canto inferior
+ * esquerdo para que as duas pontas da borda junto ao SideNav fiquem iguais.
+ */
+.astryx-app-shell.elevated
+  .astryx-app-shell-sidenav
+  + div
+  > div
+  > div:has(+ .astryx-layout-content) {
+  border-end-start-radius: var(--radius-page);
+}
+
+/* No modo claro o painel de conteúdo sai do branco puro, um tom mais baixo. */
+:root[data-theme='light']
+  .astryx-app-shell.elevated
+  .astryx-app-shell-sidenav
+  + div
+  > div
+  > div:has(+ .astryx-layout-content) {
+  background-color: #f3f3f3 !important;
+}
+
+/*
+ * A pesquisa geral vive na faixa esquerda do TopNav (logo à esquerda,
+ * usuário à direita). A posição horizontal vem do JS, alinhada à alça do
+ * SideNav, e o campo cabe numa linha só nessa faixa.
+ */
+nav.astryx-top-nav > div:first-child {
+  position: relative;
+}
+
+.fury-header-chat {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fury-header-chat > * {
+  pointer-events: auto;
+  width: 100%;
+  max-height: 100%;
+}
+
+.fury-header-chat .astryx-chat-composer {
+  max-height: 100%;
+}
+
+.fury-header-chat .astryx-chat-composer > div {
+  flex-direction: row !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+  height: 40px !important;
+  max-height: 40px !important;
+  min-height: 0 !important;
+  padding: 4px 8px 4px 14px !important;
+  gap: 8px !important;
+}
+
+.fury-header-chat .astryx-chat-composer > div > div:first-child {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.fury-header-chat .astryx-chat-composer > div > div:last-child {
+  display: none !important;
+}
+
+.fury-header-search,
+.fury-header-search > * {
+  width: 100%;
+  min-width: 0;
+}
+
+/* O campo de busca fica só o texto. A caixa é a do composer, como antes. */
+.fury-header-search .astryx-typeahead {
+  height: 22px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border-width: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.fury-header-search .astryx-typeahead:hover,
+.fury-header-search .astryx-typeahead:focus-within {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Ícones de mensagens e avisos, antes do perfil no topo. */
+.fury-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 40px;
+  margin-inline-end: 8px;
+}
+
+/* Servidores, docas e SLA ficam à esquerda da divisória do perfil. */
+.fury-ops-header {
+  margin-inline-end: 12px;
+}
+
+.fury-header-actions > [role='separator'] {
+  align-self: center;
+  height: 24px;
+  margin-inline-start: 8px;
+}
+
+.fury-header-action {
+  position: relative;
+  display: inline-flex;
+}
+
+.fury-header-action-count {
+  position: absolute;
+  top: -3px;
+  inset-inline-end: -5px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--fury-red);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Quando a contagem sobe, o número dá um pulinho sem sair do círculo. */
+.fury-header-action-count-value {
+  display: inline-block;
+}
+
+.fury-header-action-count-value.is-bumping {
+  animation: fury-count-bump 420ms cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+@keyframes fury-count-bump {
+  0% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-3px);
+  }
+  65% {
+    transform: translateY(1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fury-header-action-count-value.is-bumping {
+    animation: none;
+  }
+}
+
+.fury-header-popover {
+  display: flex;
+  flex-direction: column;
+  max-height: min(70vh, 480px);
+}
+
+.fury-header-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 8px 8px 12px;
+}
+
+.fury-header-popover-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  overflow-y: auto;
+}
+
+.fury-header-item-label {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+}
+
+.fury-header-item-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.fury-header-unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+/*
+ * Modo claro com as cores da empresa.
+ *
+ * Topo e menu lateral ficam vermelhos; a área de conteúdo, branca. Em vez de
+ * reescrever cada token de texto/ícone, as faixas vermelhas usam
+ * `color-scheme: dark`: todos os tokens `light-dark()` do tema passam a
+ * resolver para a variante escura (texto branco, overlays brancos), e só o
+ * fundo é trocado pelo vermelho. Popovers, menus e tooltips abertos a partir
+ * dessas faixas voltam para `light`, já que são claros como o conteúdo.
+ */
+:root {
+  /* Vermelho da marca, um tom mais fechado para não cansar em áreas grandes. */
+  --fury-red: #c8102e;
+}
+
+:root[data-theme='light'] .astryx-app-shell,
+:root[data-theme='light'] .astryx-app-shell-header,
+:root[data-theme='light'] .astryx-app-shell-sidenav {
+  background-color: var(--fury-red);
+}
+
+:root[data-theme='light'] .astryx-app-shell-header,
+:root[data-theme='light'] .astryx-app-shell-sidenav {
+  color-scheme: dark;
+  color: #fff;
+}
+
+:root[data-theme='light'] .astryx-app-shell-header [popover],
+:root[data-theme='light'] .astryx-app-shell-sidenav [popover] {
+  color-scheme: light;
+}
+
+/* Popovers e menus: texto escuro de novo. O tooltip (fundo escuro, texto
+   claro) cuida da própria cor e fica de fora. */
+:root[data-theme='light']
+  .astryx-app-shell-header
+  [popover]:not(.astryx-tooltip),
+:root[data-theme='light']
+  .astryx-app-shell-sidenav
+  [popover]:not(.astryx-tooltip) {
+  color: var(--color-text-primary);
+}
+
+/*
+ * Sobre o vermelho, o cinza "secondary" do tema fica fraco. Ícones, textos
+ * de apoio e o placeholder da busca ganham um branco mais forte. Popovers e
+ * menus abertos a partir dessas faixas ficam de fora (`:not([popover] *)`).
+ */
+:root[data-theme='light']
+  :is(.astryx-app-shell-header, .astryx-app-shell-sidenav)
+  .astryx-icon[data-color='secondary']:not([popover] *) {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+:root[data-theme='light']
+  :is(.astryx-app-shell-header, .astryx-app-shell-sidenav)
+  .astryx-text[data-color='secondary']:not([popover] *) {
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+
+:root[data-theme='light'] .fury-header-search input {
+  color: #fff !important;
+}
+
+:root[data-theme='light'] .fury-header-search input::placeholder {
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+
+/* Divisores do menu em branco translúcido; barra de rolagem discreta. */
+:root[data-theme='light'] .astryx-app-shell-sidenav .astryx-divider {
+  opacity: 0.6;
+}
+
+:root[data-theme='light'] .astryx-app-shell-sidenav nav.astryx-side-nav > div {
+  scrollbar-color: rgba(255, 255, 255, 0.45) transparent;
+}
+
+/* Caixa de pesquisa no topo: vidro branco sobre o vermelho. */
+:root[data-theme='light'] .fury-header-chat .astryx-chat-composer > div {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+}
+
+:root[data-theme='light']
+  .fury-header-chat
+  .astryx-chat-composer
+  > div:focus-within {
+  background-color: rgba(255, 255, 255, 0.24) !important;
+}
+
+/* Cards da Library sobre o fundo branco ganham uma borda visível. */
+:root[data-theme='light'] .fury-library-card {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/*
+ * Troca de modo: a tela nova entra por um círculo que nasce no botão de modo
+ * e cresce até cobrir a janela (View Transitions API). A posição e o raio
+ * vêm de `revealMode` em themeMode.tsx. A tela antiga fica parada por baixo.
+ */
+:root[data-fury-reveal]::view-transition-old(root),
+:root[data-fury-reveal]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+:root[data-fury-reveal]::view-transition-old(root) {
+  z-index: 1;
+}
+
+:root[data-fury-reveal]::view-transition-new(root) {
+  z-index: 2;
+  animation: fury-mode-reveal 760ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/*
+ * Enquanto a onda avança, a cor das letras e dos ícones também muda em
+ * transição, no mesmo tempo e curva do círculo, em vez de virar de uma vez.
+ * O atributo só existe durante a troca, então hovers do dia a dia não ficam
+ * lentos.
+ */
+:root[data-fury-reveal] .astryx-app-shell *,
+:root[data-fury-reveal] .astryx-app-shell *::placeholder {
+  transition: color 760ms cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+@keyframes fury-mode-reveal {
+  from {
+    clip-path: circle(
+      0px at var(--fury-reveal-x, 50%) var(--fury-reveal-y, 50%)
+    );
+  }
+  to {
+    clip-path: circle(
+      var(--fury-reveal-r, 150vmax) at var(--fury-reveal-x, 50%)
+        var(--fury-reveal-y, 50%)
+    );
+  }
+}
+
+/* O botão pulsa e solta um anel que acompanha o início da onda. */
+.fury-mode-toggle button {
+  --fury-pulse-color: rgba(200, 16, 46, 0.55);
+}
+
+:root[data-theme='light'] .fury-mode-toggle button {
+  --fury-pulse-color: rgba(255, 255, 255, 0.6);
+}
+
+.fury-mode-toggle.is-pulsing button {
+  animation: fury-mode-pulse 760ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes fury-mode-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--fury-pulse-color);
+  }
+  35% {
+    transform: scale(1.28);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 28px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fury-mode-toggle.is-pulsing button {
+    animation: none;
+  }
+}
+
+/*
+ * Carregamento aprovado: o mesmo círculo do botão de modo, em verde, nascendo
+ * no card de assinatura e crescendo até cobrir o cabeçalho e o conteúdo da
+ * tela. A posição vem do clique, em Coleta e Expedição.
+ */
+.coleta-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.coleta-stage > .astryx-layout {
+  flex: 1;
+  min-height: 0;
+}
+
+.coleta-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  animation-duration: var(--coleta-ms, 760ms);
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+.coleta-glow.is-green {
+  background: radial-gradient(
+    circle at var(--coleta-x) var(--coleta-y),
+    rgba(134, 239, 172, 0.72),
+    rgba(22, 163, 74, 0.38) 46%,
+    rgba(21, 128, 61, 0.16)
+  );
+  animation-name: coleta-glow;
+}
+
+.coleta-glow.is-red {
+  background: radial-gradient(
+    circle at var(--coleta-x) var(--coleta-y),
+    rgba(252, 165, 165, 0.78),
+    rgba(220, 38, 38, 0.42) 46%,
+    rgba(153, 27, 27, 0.16)
+  );
+  animation-name: coleta-blink;
+}
+
+.coleta-glow.is-orange {
+  background: radial-gradient(
+    circle at var(--coleta-x) var(--coleta-y),
+    rgba(253, 186, 116, 0.84),
+    rgba(234, 88, 12, 0.46) 46%,
+    rgba(154, 52, 18, 0.16)
+  );
+  animation-name: coleta-blink;
+}
+
+.coleta-glow.is-blue {
+  background: radial-gradient(
+    circle at var(--coleta-x) var(--coleta-y),
+    rgba(147, 197, 253, 0.78),
+    rgba(37, 99, 235, 0.4) 46%,
+    rgba(30, 64, 175, 0.14)
+  );
+  animation-name: coleta-blink;
+}
+
+@keyframes coleta-glow {
+  0% {
+    clip-path: circle(0px at var(--coleta-x) var(--coleta-y));
+    opacity: 1;
+  }
+  72% {
+    opacity: 0.92;
+  }
+  100% {
+    clip-path: circle(var(--coleta-r) at var(--coleta-x) var(--coleta-y));
+    opacity: 0;
+  }
+}
+
+@keyframes coleta-blink {
+  0% {
+    clip-path: circle(0px at var(--coleta-x) var(--coleta-y));
+    opacity: 0;
+  }
+  16% {
+    opacity: 1;
+  }
+  38% {
+    opacity: 0.2;
+  }
+  62% {
+    opacity: 0.95;
+  }
+  100% {
+    clip-path: circle(var(--coleta-r) at var(--coleta-x) var(--coleta-y));
+    opacity: 0;
+  }
+}
+
+.coleta-pulse {
+  position: relative;
+  z-index: 31;
+  border-radius: 12px;
+  animation: coleta-confirm-pulse var(--coleta-ms, 760ms)
+    cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.coleta-pulse.is-green {
+  --coleta-pulse: rgba(74, 222, 128, 0.7);
+}
+
+.coleta-pulse.is-red {
+  --coleta-pulse: rgba(248, 113, 113, 0.75);
+}
+
+.coleta-pulse.is-orange {
+  --coleta-pulse: rgba(251, 146, 60, 0.8);
+}
+
+.coleta-pulse.is-blue {
+  --coleta-pulse: rgba(96, 165, 250, 0.75);
+}
+
+@keyframes coleta-confirm-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 var(--coleta-pulse, rgba(74, 222, 128, 0.7));
+  }
+  35% {
+    transform: scale(1.025);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 28px transparent;
+  }
+}
+
+/* Caminhão no topo da leitura: fundo transparente e um ponto discreto atrás. */
+/*
+ * Título e caminhão dividem a mesma célula do grid: o título fica no canto e o
+ * caminhão no centro, sem empurrar nada. A altura é fixa para o hero não mudar
+ * de tamanho com a largura da tela.
+ */
+.coleta-leitura-hero {
+  position: relative;
+  display: grid;
+  grid-template-areas: 'hero';
+  height: 236px;
+  padding: 0 4px;
+  overflow: hidden;
+}
+
+.coleta-leitura-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 6px;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    color-mix(in srgb, currentColor 18%, transparent) 1px,
+    transparent 0
+  );
+  background-size: 14px 14px;
+  mask-image: radial-gradient(
+    ellipse 52% 70% at 50% 62%,
+    #000 30%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.coleta-leitura-hero::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(460px, 90%);
+  height: 72px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, currentColor 10%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.coleta-leitura-hero > h2 {
+  position: relative;
+  z-index: 2;
+  grid-area: hero;
+  align-self: start;
+  justify-self: start;
+}
+
+/* A foto é quase quadrada; o aspect-ratio estica um pouco para o caminhão ficar mais largo. */
+.coleta-leitura-truck {
+  position: relative;
+  z-index: 1;
+  grid-area: hero;
+  align-self: end;
+  justify-self: center;
+  width: min(360px, 68%);
+  aspect-ratio: 1.55;
+  height: auto;
+  max-height: 100%;
+  object-fit: fill;
+  filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.42));
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 720px) {
+  .coleta-leitura-hero {
+    grid-template-areas:
+      'title'
+      'hero';
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 232px;
+  }
+
+  .coleta-leitura-hero > h2 {
+    grid-area: title;
+  }
+
+  .coleta-leitura-truck {
+    width: min(300px, 86%);
+  }
+}
+
+/* Peso atual no painel de detalhes: soma das etiquetas já bipadas. */
+.coleta-peso {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+
+.coleta-peso-valor {
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+/* Ordem das lojas: fundo é quem chega antes, porta é quem chega por último. */
+.coleta-lojas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.coleta-lojas-trilho {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.coleta-loja {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+}
+
+.coleta-loja.is-active {
+  border-color: color-mix(in srgb, #4ade80 65%, transparent);
+}
+
+.coleta-loja-codigos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: color-mix(in srgb, currentColor 62%, transparent);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.coleta-loja-codigos .is-done {
+  color: #4ade80;
+}
+
+.coleta-loja-codigos .is-pending {
+  color: #86efac;
+}
+
+@media (max-width: 720px) {
+  .coleta-lojas-trilho {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Card hero das fotos do DCP, no painel lateral. */
+.coleta-dcp-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.coleta-dcp-hero .coleta-foto {
+  border-radius: 0;
+}
+
+/* O texto da capa ocupa a base; o ícone sobe para não ficar embaixo dele. */
+.coleta-dcp-hero .coleta-foto-placeholder {
+  padding-bottom: 56px;
+}
+
+.coleta-dcp-hero-copy {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 32px 12px 10px;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.78), transparent);
+  pointer-events: none;
+}
+
+.coleta-dcp-hero-copy strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.coleta-dcp-hero-copy span {
+  font-size: 12px;
+  opacity: 0.88;
+}
+
+/*
+ * Foto do DCP com os estados do Thumbnail: skeleton, placeholder, envio e
+ * carregada. A proporção vem do AspectRatio; a foto só preenche a caixa.
+ */
+.coleta-foto {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-element);
+}
+
+/* Fundo só no placeholder: atrás do Skeleton ele apagaria o pulso de opacidade. */
+.coleta-foto.is-placeholder {
+  background-color: var(--color-neutral);
+}
+
+.coleta-foto > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 200ms ease;
+}
+
+.coleta-foto-camada {
+  position: absolute;
+  inset: 0;
+}
+
+.coleta-foto-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-icon-secondary);
+}
+
+.coleta-foto-envio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-overlay, rgba(0, 0, 0, 0.45));
+}
+
+/* Galeria das fotos: mesmo desenho do mixed-gallery, com a primeira foto em destaque. */
+.coleta-fotos {
+  container: coleta-fotos / inline-size;
+}
+
+.coleta-fotos-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.coleta-fotos-grid > figure {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+}
+
+.coleta-fotos-grid > .is-hero {
+  grid-column: span 2;
+}
+
+@container coleta-fotos (max-width: 720px) {
+  .coleta-fotos-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coleta-fotos-grid > .is-hero {
+    grid-column: 1 / -1;
+  }
+
+  /* Sobrescreve o 3:1 do AspectRatio para os quadros empilhados ficarem iguais. */
+  .coleta-fotos-grid > .is-hero .coleta-foto-ratio {
+    aspect-ratio: 3 / 2;
+  }
+}
+
+/* Código da etiqueta: cada algarismo entra da esquerda para a direita. */
+.coleta-scan-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 14px;
+  overflow: hidden;
+  color: inherit;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.16em;
+}
+
+.coleta-scan-capture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  opacity: 0;
+  cursor: text;
+}
+
+.coleta-scan-capture:disabled {
+  cursor: default;
+}
+
+.coleta-code-ghost {
+  color: color-mix(in srgb, currentColor 42%, transparent);
+  letter-spacing: 0.04em;
+  font-size: 15px;
+}
+
+.coleta-code-digit {
+  display: inline-block;
+  animation: coleta-digit-in 460ms cubic-bezier(0.16, 0.84, 0.24, 1) both;
+}
+
+.coleta-scan-field > span {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.coleta-code-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 3px;
+  background: currentColor;
+  animation: coleta-caret 1s steps(1) infinite;
+}
+
+@keyframes coleta-digit-in {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes coleta-caret {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  46%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.coleta-estorno-note {
+  color: #60a5fa;
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coleta-glow,
+  .coleta-pulse,
+  .coleta-code-digit,
+  .coleta-code-caret {
+    animation: none;
+  }
+}
+
+/* Spinner centralizado na área de conteúdo enquanto a tela carrega. */
+.fury-screen-loading {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+/*
+ * Tela inicial (Library): grade de áreas. O bloco colorido substitui a
+ * imagem de fundo; o ícone fica num quadrado branco, no mesmo traço dos
+ * ícones do menu.
+ */
+.fury-library-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.fury-library-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-container);
+  background: var(--color-background-card);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* O Section interno herdaria o padding da página e sairia do card. */
+  --container-padding-inline-start: 0px;
+  --container-padding-inline-end: 0px;
+  --container-padding-block-start: 0px;
+  --container-padding-block-end: 0px;
+}
+
+.fury-library-media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.fury-library-menu {
+  width: 100%;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.fury-library-menu > button svg {
+  transition: transform 220ms cubic-bezier(0.24, 1, 0.4, 1);
+}
+
+.fury-library-menu > button[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.fury-library-icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 10px 24px rgba(10, 19, 23, 0.16);
+}
+
+@media (max-width: 1100px) {
+  .fury-library-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .fury-library-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Tour do primeiro acesso: cobre a casca e recorta o controle explicado. */
+.fury-tour-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+}
+
+.fury-tour-hole {
+  position: fixed;
+  z-index: 81;
+  border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(8, 12, 16, 0.62);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  pointer-events: none;
+}
+
+.fury-tour-card {
+  position: fixed;
+  z-index: 82;
+  width: min(400px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  outline: none;
+}
+
+.fury-tour-card > * {
+  width: 100%;
+}
+
+.fury-tour-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-neutral);
+  overflow: hidden;
+}
+
+.fury-tour-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-accent);
+}
+
+/* Painéis: colunas empilhadas, no desenho do gráfico de referência. */
+.fury-sector-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-accent, #0171e3) 14%, transparent);
+  color: var(--color-accent, #0171e3);
+}
+
+.fury-stack {
+  background: #d9d9d9;
+  border-radius: 4px;
+  padding: 18px 16px 14px 8px;
+}
+
+.fury-stack-plot {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  grid-template-rows: 220px auto;
+}
+
+.fury-stack-y {
+  position: relative;
+  grid-column: 1;
+  grid-row: 1;
+  height: 220px;
+}
+
+.fury-stack-tick {
+  position: absolute;
+  right: 8px;
+  bottom: calc(var(--p) * 1%);
+  transform: translateY(50%);
+  font-size: 12px;
+  line-height: 1;
+  color: #8a8a8a;
+  font-variant-numeric: tabular-nums;
+}
+
+.fury-stack-grid {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  height: 220px;
+  pointer-events: none;
+}
+
+.fury-stack-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--p) * 1%);
+  border-top: 1px solid rgba(255, 255, 255, 0.72);
+}
+
+.fury-stack-cols {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.fury-stack-col {
+  flex: 1 1 120px;
+  max-width: 168px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  margin: 0;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.fury-stack-col:hover .fury-stack-name,
+.fury-stack-col[aria-pressed='true'] .fury-stack-name {
+  color: #3a3a3a;
+}
+
+.fury-stack-col[aria-pressed='true'] .fury-stack-bar {
+  outline: 2px solid #1d6aab;
+  outline-offset: 3px;
+}
+
+.fury-stack-col:focus-visible {
+  outline: 2px solid #1d6aab;
+  outline-offset: 2px;
+}
+
+.fury-stack-slot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 220px;
+}
+
+.fury-stack-bar {
+  display: flex;
+  flex-direction: column;
+  width: min(84px, 72%);
+  height: calc(var(--h) * 1%);
+  transform-origin: bottom center;
+  animation: fury-stack-rise 900ms cubic-bezier(0.22, 0.7, 0.28, 1) both;
+  animation-delay: calc(var(--i) * 80ms);
+}
+
+.fury-stack-seg {
+  width: 100%;
+  flex-grow: var(--v);
+  flex-shrink: 1;
+  flex-basis: 0;
+  min-height: 0;
+}
+
+.fury-stack-seg[data-layer='base'],
+.fury-stack-swatch[data-layer='base'] {
+  background: #7fe3f6;
+}
+
+.fury-stack-seg[data-layer='meio'],
+.fury-stack-swatch[data-layer='meio'] {
+  background: #3aa0d6;
+}
+
+.fury-stack-seg[data-layer='topo'],
+.fury-stack-swatch[data-layer='topo'] {
+  background: #1d6aab;
+}
+
+.fury-stack-seg[data-cap='true'] {
+  border-radius: 3px 3px 0 0;
+}
+
+.fury-stack-value {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #3a3a3a;
+  font-variant-numeric: tabular-nums;
+}
+
+.fury-stack-name {
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.25;
+  color: #8a8a8a;
+}
+
+.fury-stack-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding-left: 48px;
+}
+
+.fury-stack-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6e6e6e;
+}
+
+.fury-stack-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.fury-stack-reading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@keyframes fury-stack-rise {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fury-stack-bar {
+    animation: none;
+  }
+}
