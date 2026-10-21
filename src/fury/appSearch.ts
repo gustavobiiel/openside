@@ -1,10 +1,20 @@
 import type {SearchableItem} from '@astryxdesign/core/Typeahead';
+import {COLETA_SEARCH} from '../app/coleta-expedicao/page';
 import {LIBRARY_AREAS} from '../app/library/LibraryHome';
+import {OPS_BOARDS} from '../app/operacao/boards';
+import {ENTREGA_SEARCH} from '../app/table-filter/page';
+import {screenRole} from '../app/workspace/WorkspaceScreen';
 import {PAGE_TITLES, PLACEHOLDER_PAGES} from '../pages';
 import {SEARCH_RECORDS, TYPE_LABELS} from '../searchData';
 
+type SearchFocus = {
+  /** Texto que a página de destino coloca no próprio campo de busca. */
+  query?: string;
+  recordId?: string;
+};
+
 export type AppSearchTarget =
-  | {
+  | ({
       action: 'panel';
       panel:
         | 'library'
@@ -16,10 +26,12 @@ export type AppSearchTarget =
         | 'servidores'
         | 'docas'
         | 'sla';
-    }
-  | {action: 'chat'; label: string}
+    } & SearchFocus)
+  | ({action: 'chat'; label: string} & SearchFocus)
   | {action: 'meire'; id: string}
   | {action: 'new-chat'};
+
+export type SearchVia = 'result' | 'query';
 
 export type AppSearchItem = SearchableItem<{
   group: string;
@@ -216,16 +228,17 @@ export function buildAppSearchItems({
   });
 
   const conversations = workspaces.flatMap(workspace =>
-    workspace.chats.map(chat =>
-      item(
+    workspace.chats.map(chat => {
+      const role = screenRole(chat.label);
+      return item(
         `chat-${normalize(workspace.name)}-${normalize(chat.label)}`,
         chat.label,
         'Conversas',
-        `${workspace.name} · ${chat.statusLabel}`,
-        [workspace.name, chat.statusLabel, chat.label],
+        `${workspace.name} · ${role}`,
+        [workspace.name, chat.statusLabel, chat.label, role],
         {action: 'chat', label: chat.label},
-      ),
-    ),
+      );
+    }),
   );
 
   const meire = meireChats.map(chat =>
@@ -272,11 +285,100 @@ export function buildAppSearchItems({
           record.subtitle,
           ...(record.keywords ?? []),
         ],
-        {action: 'chat', label: RECORD_CHAT[record.page]},
+        {action: 'chat', label: RECORD_CHAT[record.page], query: record.label, recordId: record.id},
       ),
     );
 
-  return [...screens, ...areas, ...conversations, ...meire, ...pages, ...records];
+  const operations = Object.values(OPS_BOARDS).flatMap(board =>
+    board.rows.map(row =>
+      item(
+        `ops-${row.id}`,
+        row.title,
+        'Registros',
+        `${board.title} · ${row.code} · ${row.detail}`,
+        [
+          row.code,
+          row.detail,
+          row.context,
+          row.owner,
+          row.statusLabel,
+          row.metric,
+          board.title,
+          board.description,
+          ...row.facts.flatMap(fact => [fact.label, fact.value]),
+        ],
+        {action: 'panel', panel: board.id, query: row.code, recordId: row.id},
+      ),
+    ),
+  );
+
+  const deliveries = ENTREGA_SEARCH.map(record =>
+    item(
+      `entrega-${record.id}`,
+      record.label,
+      'Registros',
+      record.subtitle,
+      record.keywords,
+      {action: 'chat', label: 'Entregas', query: record.label, recordId: record.id},
+    ),
+  );
+
+  const pickups = COLETA_SEARCH.map(record =>
+    item(
+      `coleta-${record.id}`,
+      record.label,
+      'Registros',
+      record.subtitle,
+      record.keywords,
+      {
+        action: 'chat',
+        label: 'Coleta e Expedição',
+        query: record.label,
+        recordId: record.id,
+      },
+    ),
+  );
+
+  return [
+    ...screens,
+    ...areas,
+    ...conversations,
+    ...meire,
+    ...pages,
+    ...records,
+    ...operations,
+    ...deliveries,
+    ...pickups,
+  ];
+}
+
+/**
+ * Onde a busca cai. Clicar um registro abre a página dele já no item.
+ * Enter leva a página do melhor resultado e coloca nela o que foi digitado.
+ */
+export function searchLanding(
+  result: AppSearchItem,
+  typed: string,
+  via: SearchVia,
+): {query: string; recordId: string | null} | null {
+  const target = result.auxiliaryData.target;
+  if (target.action !== 'chat' && target.action !== 'panel') {
+    return null;
+  }
+  const recordId = target.recordId ?? null;
+  const typedFold = normalize(typed);
+  const labelFold = normalize(result.label);
+  const queryFold = normalize(target.query ?? '');
+  if (
+    recordId &&
+    (via === 'result' || typedFold === labelFold || typedFold === queryFold)
+  ) {
+    return {query: target.query || result.label, recordId};
+  }
+  if (!recordId && (!typedFold || labelFold.includes(typedFold))) {
+    return null;
+  }
+  return {query: typed.trim(), recordId: null};
 }
 
 export function searchApp(items: AppSearchItem[], query: string, limit = 10) {

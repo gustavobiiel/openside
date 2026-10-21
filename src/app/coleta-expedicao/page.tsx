@@ -140,6 +140,40 @@ const VIAGEM = {
   saidaPrevista: '06:00',
 };
 
+/** O que a busca do topo precisa para abrir esta tela no item certo. */
+export const COLETA_SEARCH = [
+  ...LOJAS.map(loja => ({
+    id: loja.id,
+    label: loja.nome,
+    subtitle: `${loja.cidade} · chega ${loja.chegada}`,
+    keywords: [loja.cidade, 'loja', 'coleta'],
+  })),
+  ...ETIQUETAS.map(item => ({
+    id: item.id,
+    label: item.id,
+    subtitle: item.volume,
+    keywords: [item.volume, 'etiqueta', 'volume', 'coleta'],
+  })),
+  ...VEICULOS.map(item => ({
+    id: item.id,
+    label: item.label,
+    subtitle: `Até ${item.capacidadeKg.toLocaleString('pt-BR')} kg`,
+    keywords: ['veículo', 'coleta', 'capacidade'],
+  })),
+  {
+    id: CARGA.pedido,
+    label: CARGA.pedido,
+    subtitle: 'Pedido da coleta',
+    keywords: ['pedido', 'coleta', 'expedição'],
+  },
+  {
+    id: VIAGEM.numero,
+    label: VIAGEM.numero,
+    subtitle: `Saída prevista ${VIAGEM.saidaPrevista}`,
+    keywords: ['viagem', 'coleta', 'expedição'],
+  },
+];
+
 const STEP_META = [
   {label: 'Veículo na doca'},
   {label: 'Carregamento'},
@@ -184,7 +218,11 @@ type ScanNotice = {
   message: string;
 };
 
-export default function ColetaExpedicaoTemplate() {
+export default function ColetaExpedicaoTemplate({
+  initialQuery = '',
+}: {
+  initialQuery?: string;
+} = {}) {
   const showToast = useToast();
   const stageRef = useRef<HTMLDivElement>(null);
   const scanCardRef = useRef<HTMLDivElement>(null);
@@ -194,7 +232,10 @@ export default function ColetaExpedicaoTemplate() {
   const weightCited = useRef(false);
 
   const [active, setActive] = useState(0);
-  const [placa, setPlaca] = useState('');
+  const placaInicial = PLACA_REGEX.test(initialQuery.trim().toUpperCase())
+    ? initialQuery.trim().toUpperCase()
+    : '';
+  const [placa, setPlaca] = useState(placaInicial);
   const [docaId, setDocaId] = useState('');
   const [cordas, setCordas] = useState<number | null>(null);
   const [tapumes, setTapumes] = useState('');
@@ -561,6 +602,11 @@ export default function ColetaExpedicaoTemplate() {
                   Comece pela placa. Doca, cordas e tapumes aparecem em seguida,
                   para liberar o carregamento.
                 </Text>
+                {initialQuery && !placaInicial ? (
+                  <Text type="supporting" color="secondary">
+                    {`Busca · ${initialQuery}`}
+                  </Text>
+                ) : null}
               </VStack>
             </LayoutHeader>
           )

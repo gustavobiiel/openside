@@ -533,6 +533,21 @@ const seedJobs: SeedJob[] = [
   },
 ];
 
+/** O que a busca do topo precisa para abrir esta tela já filtrada. */
+export const ENTREGA_SEARCH = seedJobs.map(job => ({
+  id: job.id,
+  label: job.id,
+  subtitle: `${job.summary} · ${job.customer}`,
+  keywords: [
+    job.summary,
+    job.customer,
+    job.address,
+    job.technician,
+    job.equipment,
+    'entrega',
+  ],
+}));
+
 const DAY_MS = 86_400_000;
 
 /** Read once at load, so a preset's filter value stays referentially stable. */
@@ -2208,7 +2223,13 @@ function AdaptiveSavedViewForm({
 // Template
 // =============================================================================
 
-export default function TableFilterTemplate() {
+export default function TableFilterTemplate({
+  initialQuery = '',
+  initialJobId = null,
+}: {
+  initialQuery?: string;
+  initialJobId?: string | null;
+} = {}) {
   // Named for the surface, not the size: `isCompact` further down is the
   // density setting, which is a different thing entirely.
   //
@@ -2218,9 +2239,11 @@ export default function TableFilterTemplate() {
   const isCompactSurface = useMediaQuery(COMPACT_SURFACE_QUERY);
 
   // --- Filtering -------------------------------------------------------------
-  const [filters, setFilters] = useState<PowerSearchFilter[]>(INITIAL_FILTERS);
+  const [filters, setFilters] = useState<PowerSearchFilter[]>(
+    initialQuery ? [] : INITIAL_FILTERS,
+  );
   const [isPowerSearch, setIsPowerSearch] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery);
 
   // --- Saved views -----------------------------------------------------------
   const [savedViews, setSavedViews] = useState(INITIAL_SAVED_VIEWS);
@@ -2235,7 +2258,7 @@ export default function TableFilterTemplate() {
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
 
   /** Row whose details are open in the end panel. Independent of bulk selection. */
-  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+  const [activeJobId, setActiveJobId] = useState<string | null>(initialJobId);
 
   // The floor keeps the MetadataList's 104px label column from squeezing its
   // values below a readable line; the ceiling stops the panel from taking so
@@ -2304,15 +2327,19 @@ export default function TableFilterTemplate() {
 
   const results = useMemo(() => {
     const byFilters = applyFilters(filters, allJobs);
-    const q = query.trim().toLowerCase();
+    const q = query
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+    const haystack = (job: ServiceJob) =>
+      [job.summary, job.customer, job.technician, job.id, job.address, job.equipment]
+        .join(' ')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
     const byQuery = q
-      ? byFilters.filter(
-          j =>
-            j.summary.toLowerCase().includes(q) ||
-            j.customer.toLowerCase().includes(q) ||
-            j.technician.toLowerCase().includes(q) ||
-            j.id.toLowerCase().includes(q),
-        )
+      ? byFilters.filter(job => haystack(job).includes(q))
       : byFilters;
     if (sort.length === 0 && !isGrouped) {
       return byQuery;

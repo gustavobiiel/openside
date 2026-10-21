@@ -17,7 +17,8 @@ import DashboardTemplate from '../dashboard/page';
 import TableFilterTemplate from '../table-filter/page';
 import ColetaExpedicaoTemplate from '../coleta-expedicao/page';
 import AIChatTemplate from '../ai-chat-landing/page';
-import AIChatConversationTemplate from '../ai-chat/page';
+import MeireThread from '../ai-chat/MeireThread';
+import WorkspaceScreen, {screenRole} from '../workspace/WorkspaceScreen';
 import {Text} from '@astryxdesign/core/Text';
 import {TopNav, TopNavHeading} from '@astryxdesign/core/TopNav';
 import type {IconType} from '@astryxdesign/core/Icon';
@@ -42,8 +43,11 @@ import {
 import {
   buildAppSearchItems,
   searchApp,
+  searchLanding,
   type AppSearchItem,
+  type SearchVia,
 } from '../../fury/appSearch';
+import {getRecordsForPage} from '../../searchData';
 import HeaderActions from '../../fury/HeaderActions';
 import OpsHeader from '../../fury/OpsHeader';
 import OpsBoard from '../operacao/OpsBoard';
@@ -160,6 +164,13 @@ type MeireChat = {
 const FIRST_ACCESS_TOUR_KEY = 'fury-first-access-tour';
 const TOUR_AFTER_LOGIN_KEY = 'fury-tour-after-login';
 
+const CHAT_RECORD_PAGE: Record<string, string> = {
+  Carregamento: 'carregamento',
+  Pedidos: 'pedidos',
+  Veículos: 'veiculos',
+  Motoristas: 'motoristas',
+};
+
 const INITIAL_MEIRE_CHATS: MeireChat[] = [
   {id: 'jwt', title: 'JWT Token Refresh', isNew: false},
   {id: 'rota', title: 'Atraso na rota SP–RJ', isNew: false},
@@ -168,6 +179,8 @@ const INITIAL_MEIRE_CHATS: MeireChat[] = [
 
 /** Largura da pesquisa geral no topo. */
 const HEADER_CHAT_WIDTH = 450;
+/** Abaixo disso o campo come a faixa vazia entre a logo e a alça do SideNav. */
+const HEADER_CHAT_MIN_WIDTH = 280;
 /** Folga mínima até os ícones de mensagens e avisos, que ficam antes do perfil. */
 const HEADER_CHAT_END_GAP = 24;
 /** Folga mínima depois da logo, usada só se a alça ficar por baixo dela. */
@@ -209,7 +222,7 @@ function useHeaderChatFrame(sideNavEl: HTMLElement | null): HeaderChatFrame | nu
       const logoLimit = logo
         ? logo.getBoundingClientRect().right + HEADER_CHAT_LOGO_GAP
         : laneRect.left;
-      const left =
+      let left =
         Math.round((Math.max(lineLeft, logoLimit) - laneRect.left) * 100) /
         100;
       const endSlot = Array.from(lane.children).find(
@@ -223,7 +236,14 @@ function useHeaderChatFrame(sideNavEl: HTMLElement | null): HeaderChatFrame | nu
       const available = Math.floor(
         rightLimit - (laneRect.left + left) - HEADER_CHAT_END_GAP,
       );
-      const width = Math.max(0, Math.min(HEADER_CHAT_WIDTH, available));
+      let width = Math.max(0, Math.min(HEADER_CHAT_WIDTH, available));
+      if (width < HEADER_CHAT_MIN_WIDTH) {
+        const logoLeft =
+          Math.round((logoLimit - laneRect.left) * 100) / 100;
+        const rightEdge = left + width;
+        left = Math.max(logoLeft, rightEdge - HEADER_CHAT_MIN_WIDTH);
+        width = Math.max(0, Math.floor(rightEdge - left));
+      }
       setFrame(prev =>
         prev && prev.left === left && prev.width === width
           ? prev
@@ -342,11 +362,15 @@ function HeaderSearch({
   sideNavEl,
   items,
   onSelect,
+  onStartChat,
 }: {
   sideNavEl: HTMLElement | null;
   items: AppSearchItem[];
-  onSelect: (item: AppSearchItem) => void;
+  onSelect: (item: AppSearchItem, typed: string, via: SearchVia) => void;
+  onStartChat: (text: string) => void;
 }) {
+  const [draft, setDraft] = useState('');
+  const [fieldKey, setFieldKey] = useState(0);
   const frame = useHeaderChatFrame(sideNavEl);
   const searchSource = useMemo<SearchSource<AppSearchItem>>(
     () => ({
@@ -369,6 +393,55 @@ function HeaderSearch({
     return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  const submitQuery = (text: string) => {
+    const clean = text.trim();
+    if (!clean) {
+      return;
+    }
+    const [best] = searchApp(items, clean, 1);
+    if (best) {
+      onSelect(best, clean, 'query');
+    } else {
+      onStartChat(clean);
+    }
+    setDraft('');
+    setFieldKey(key => key + 1);
+  };
+
+  useEffect(() => {
+    const onEnter = (event: KeyboardEvent) => {
+      if (event.key !== 'Enter' || event.shiftKey || event.isComposing) {
+        return;
+      }
+      const root = document.querySelector('.fury-header-search');
+      if (!(root instanceof HTMLElement)) {
+        return;
+      }
+      const field = root.querySelector('input');
+      if (!field) {
+        return;
+      }
+      const menuId = field.getAttribute('aria-controls');
+      const menu = menuId ? document.getElementById(menuId) : null;
+      const target = event.target;
+      const inside =
+        target instanceof Node &&
+        (root.contains(target) || Boolean(menu?.contains(target)));
+      if (!inside && document.activeElement !== field) {
+        return;
+      }
+      const text = field.value.trim();
+      if (!text) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      submitQuery(text);
+    };
+    window.addEventListener('keydown', onEnter, true);
+    return () => window.removeEventListener('keydown', onEnter, true);
+  }, [items, onSelect, onStartChat]);
+
   if (!frame || frame.width <= 0) {
     return null;
   }
@@ -380,15 +453,31 @@ function HeaderSearch({
       style={{left: frame.left, width: frame.width}}>
       <Stack direction="vertical" width={HEADER_CHAT_WIDTH} maxWidth="100%">
         <ChatComposer
-          placeholder="Pesquisar no app…"
-          onSubmit={() => {}}
-          sendButton={<span hidden />}
+          value={draft}
+          onChange={setDraft}
+          placeholder="Pergunte à Meire…"
+          onSubmit={submitQuery}
           input={
-            <div className="fury-header-search">
+            <div
+              className="fury-header-search"
+              onKeyDownCapture={event => {
+                if (event.key !== 'Enter' || event.shiftKey) {
+                  return;
+                }
+                const field = event.currentTarget.querySelector('input');
+                const text = (field?.value || draft).trim();
+                if (!text) {
+                  return;
+                }
+                event.preventDefault();
+                event.stopPropagation();
+                submitQuery(text);
+              }}>
               <Typeahead
-                label="Pesquisar"
+                key={fieldKey}
+                label="Pergunte à Meire"
                 isLabelHidden
-                placeholder="Pesquisar no app…"
+                placeholder="Pergunte à Meire…"
                 searchSource={searchSource}
                 value={null}
                 debounceMs={0}
@@ -397,8 +486,14 @@ function HeaderSearch({
                 maxMenuItems={10}
                 emptySearchResultsText="Nenhum resultado"
                 hasClear
+                onChangeQuery={setDraft}
                 onChange={item => {
-                  if (item) onSelect(item);
+                  if (!item) {
+                    return;
+                  }
+                  onSelect(item, draft, 'result');
+                  setDraft('');
+                  setFieldKey(key => key + 1);
                 }}
                 renderItem={result => (
                   <TypeaheadItem
@@ -637,9 +732,16 @@ export default function ShellSideNav() {
   const [sideNavEl, setSideNavEl] = useState<HTMLElement | null>(null);
   const [panel, setPanel] = useState<Panel>('library');
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const [pageFocus, setPageFocus] = useState<{
+    query: string;
+    recordId: string | null;
+  } | null>(null);
   const [meireChats, setMeireChats] = useState<MeireChat[]>(INITIAL_MEIRE_CHATS);
   const [activeMeireChatId, setActiveMeireChatId] = useState<string | null>(
     null,
+  );
+  const [meireOpenings, setMeireOpenings] = useState<Record<string, string>>(
+    {},
   );
   const [isMeireCollapsed, setIsMeireCollapsed] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -676,6 +778,20 @@ export default function ShellSideNav() {
       return aPinned ? -1 : 1;
     });
 
+  const openChat = (label: string) => {
+    setPageFocus(null);
+    setSelectedChat(label);
+    setPanel('chat');
+  };
+
+  const openNamedPanel = (next: Panel) => {
+    setPageFocus(null);
+    setPanel(next);
+    if (next === 'meire') {
+      setIsMeireCollapsed(false);
+    }
+  };
+
   const favoriteItems = favorites.flatMap(key => {
     const separator = key.indexOf(':');
     const kind = key.slice(0, separator);
@@ -701,10 +817,7 @@ export default function ShellSideNav() {
           status: chat.status,
           statusLabel: chat.statusLabel,
           isSelected: panel === 'chat' && chat.label === selectedChat,
-          onSelect: () => {
-            setSelectedChat(chat.label);
-            setPanel('chat');
-          },
+          onSelect: () => openChat(chat.label),
         }]
       : [];
   });
@@ -746,8 +859,7 @@ export default function ShellSideNav() {
     } catch {
       /* o tour deixa de abrir nesta sessão mesmo sem o storage */
     }
-    setSelectedChat(choice.screen);
-    setPanel('chat');
+    openChat(choice.screen);
     setTourOpen(false);
     setFarewell({screen: choice.screen});
   };
@@ -770,6 +882,18 @@ export default function ShellSideNav() {
     openMeireChat(id);
   };
 
+  const beginMeireChat = (text: string) => {
+    const clean = text.trim().replace(/\s+/g, ' ');
+    if (!clean) {
+      return;
+    }
+    const title = clean.length > 42 ? `${clean.slice(0, 42)}…` : clean;
+    const id = `new-${Date.now()}`;
+    setMeireChats(prev => [{id, title, isNew: true}, ...prev]);
+    setMeireOpenings(prev => ({...prev, [id]: clean}));
+    openMeireChat(id);
+  };
+
   const searchItems = useMemo(
     () =>
       buildAppSearchItems({
@@ -779,16 +903,24 @@ export default function ShellSideNav() {
     [meireChats],
   );
 
-  const openSearchResult = (result: AppSearchItem) => {
+  const openSearchResult = (
+    result: AppSearchItem,
+    typed: string,
+    via: SearchVia,
+  ) => {
     const target = result.auxiliaryData.target;
     if (target.action === 'new-chat') {
+      setPageFocus(null);
       startNewMeireChat();
       return;
     }
     if (target.action === 'meire') {
+      setPageFocus(null);
       openMeireChat(target.id);
       return;
     }
+    const landing = searchLanding(result, typed, via);
+    setPageFocus(landing);
     if (target.action === 'chat') {
       setSelectedChat(target.label);
       setPanel('chat');
@@ -799,6 +931,24 @@ export default function ShellSideNav() {
       setIsMeireCollapsed(false);
     }
   };
+
+  const activeWorkspace = WORKSPACES.find(workspace =>
+    workspace.chats.some(chat => chat.label === selectedChat),
+  );
+  const activeConversation = activeWorkspace?.chats.find(
+    chat => chat.label === selectedChat,
+  );
+  const focusQuery = pageFocus?.query ?? '';
+  const focusRecord = pageFocus?.recordId ?? null;
+  const recordPage = selectedChat ? CHAT_RECORD_PAGE[selectedChat] : undefined;
+  const screenRecords = recordPage
+    ? getRecordsForPage(recordPage).map(record => ({
+        id: record.id,
+        label: record.label,
+        subtitle: record.subtitle,
+        status: record.status,
+      }))
+    : [];
 
   return (
     <>
@@ -832,6 +982,7 @@ export default function ShellSideNav() {
               sideNavEl={sideNavEl}
               items={searchItems}
               onSelect={openSearchResult}
+              onStartChat={beginMeireChat}
             />
           }
           endContent={
@@ -842,7 +993,7 @@ export default function ShellSideNav() {
                 size="sm"
                 data-tour="ajuda"
                 icon={<Icon icon={QuestionMarkCircleIcon} size="sm" />}
-                onClick={() => setPanel('help')}
+                onClick={() => openNamedPanel('help')}
               />
               <OpsHeader
                 active={
@@ -850,19 +1001,18 @@ export default function ShellSideNav() {
                     ? panel
                     : null
                 }
-                onSelect={next => setPanel(panel === next ? 'library' : next)}
+                onSelect={next =>
+                  openNamedPanel(panel === next ? 'library' : next)
+                }
               />
               <HeaderActions
-                onOpenChat={label => {
-                  setSelectedChat(label);
-                  setPanel('chat');
-                }}
+                onOpenChat={openChat}
               />
               <button
                 type="button"
                 data-tour="perfil"
                 aria-label="Ana Thomas, Analista de logística"
-                onClick={() => setPanel('profile')}
+                onClick={() => openNamedPanel('profile')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -910,7 +1060,7 @@ export default function ShellSideNav() {
                 isSelected={panel === 'settings'}
                 onClick={event => {
                   event.preventDefault();
-                  setPanel('settings');
+                  openNamedPanel('settings');
                 }}
               />
               <SideNavItem label="Sarah Chen" icon={UserCircleIcon} href="#" />
@@ -937,7 +1087,7 @@ export default function ShellSideNav() {
               }}
               onClick={event => {
                 event.preventDefault();
-                setPanel('meire');
+                openNamedPanel('meire');
                 setIsMeireCollapsed(false);
               }}>
               <VStack gap={0.5}>
@@ -964,7 +1114,7 @@ export default function ShellSideNav() {
               isSelected={panel === 'dashboards'}
               onClick={event => {
                 event.preventDefault();
-                setPanel('dashboards');
+                openNamedPanel('dashboards');
               }}
             />
             <SideNavItem
@@ -974,7 +1124,7 @@ export default function ShellSideNav() {
               isSelected={panel === 'library'}
               onClick={event => {
                 event.preventDefault();
-                setPanel('library');
+                openNamedPanel('library');
               }}
             />
           </SideNavSection>
@@ -1026,10 +1176,7 @@ export default function ShellSideNav() {
                       }
                       isFavorite={favorites.includes(`chat:${chat.label}`)}
                       isPinned={pinned.includes(`chat:${chat.label}`)}
-                      onSelect={() => {
-                        setSelectedChat(chat.label);
-                        setPanel('chat');
-                      }}
+                      onSelect={() => openChat(chat.label)}
                       onToggleFavorite={() => toggleFavorite(`chat:${chat.label}`)}
                       onTogglePin={() => togglePin(`chat:${chat.label}`)}
                     />
@@ -1045,13 +1192,18 @@ export default function ShellSideNav() {
       ) : panel === 'profile' ? (
         <SettingsSecurityTemplate />
       ) : panel === 'settings' ? (
-        <SettingsDialogTemplate onClose={() => setPanel('library')} />
+        <SettingsDialogTemplate onClose={() => openNamedPanel('library')} />
       ) : panel === 'dashboards' ? (
         <DashboardTemplate />
       ) : panel === 'meire' ? (
-        <AIChatTemplate />
+        <AIChatTemplate onStart={beginMeireChat} />
       ) : panel === 'servidores' || panel === 'docas' || panel === 'sla' ? (
-        <OpsBoard key={panel} config={OPS_BOARDS[panel]} />
+        <OpsBoard
+          key={`${panel}:${focusQuery}:${focusRecord ?? ''}`}
+          config={OPS_BOARDS[panel]}
+          initialQuery={focusQuery}
+          initialSelectedId={focusRecord}
+        />
       ) : panel === 'help' ? (
         <Layout
           height="fill"
@@ -1062,16 +1214,38 @@ export default function ShellSideNav() {
           }
         />
       ) : panel === 'meire-chat' && activeMeireChat ? (
-        <AIChatConversationTemplate
+        <MeireThread
           key={activeMeireChat.id}
-          isNew={activeMeireChat.isNew}
+          title={activeMeireChat.title}
+          opening={meireOpenings[activeMeireChat.id]}
         />
       ) : panel === 'chat' && selectedChat === 'Entregas' ? (
-        <TableFilterTemplate />
+        <TableFilterTemplate
+          key={`entregas:${focusQuery}:${focusRecord ?? ''}`}
+          initialQuery={focusQuery}
+          initialJobId={focusRecord}
+        />
       ) : panel === 'chat' && selectedChat === 'Coleta e Expedição' ? (
-        <ColetaExpedicaoTemplate />
-      ) : panel === 'chat' && selectedChat ? (
-        <AIChatConversationTemplate key={selectedChat} isNew={false} />
+        <ColetaExpedicaoTemplate
+          key={`coleta:${focusQuery}`}
+          initialQuery={focusQuery}
+        />
+      ) : panel === 'chat' &&
+        selectedChat &&
+        activeWorkspace &&
+        activeConversation ? (
+        <WorkspaceScreen
+          key={selectedChat}
+          sector={activeWorkspace.name}
+          icon={activeWorkspace.icon}
+          label={selectedChat}
+          role={screenRole(selectedChat)}
+          status={activeConversation.status}
+          statusLabel={activeConversation.statusLabel}
+          query={focusQuery}
+          records={screenRecords}
+          activeRecordId={focusRecord}
+        />
       ) : (
         <Layout
           height="fill"
@@ -1079,10 +1253,7 @@ export default function ShellSideNav() {
             <LayoutContent padding={6}>
               {panel === 'library' ? (
                 <LibraryHome
-                  onOpenConversation={label => {
-                    setSelectedChat(label);
-                    setPanel('chat');
-                  }}
+                  onOpenConversation={openChat}
                 />
               ) : null}
             </LayoutContent>

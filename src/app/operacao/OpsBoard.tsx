@@ -97,28 +97,46 @@ function orderedKeys(
   });
 }
 
-function rowMatches(row: OpsRow, query: string): boolean {
-  const haystack = [
-    row.code,
-    row.title,
-    row.detail,
-    row.context,
-    row.owner,
-    row.statusLabel,
-    row.metric,
-  ]
-    .join(' ')
-    .toLowerCase();
-  return haystack.includes(query);
+function fold(value: string) {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 }
 
-export default function OpsBoard({config}: {config: OpsBoardConfig}) {
+function rowMatches(row: OpsRow, query: string): boolean {
+  const haystack = fold(
+    [
+      row.code,
+      row.title,
+      row.detail,
+      row.context,
+      row.owner,
+      row.statusLabel,
+      row.metric,
+      ...row.facts.flatMap(fact => [fact.label, fact.value]),
+    ].join(' '),
+  );
+  return haystack.includes(fold(query));
+}
+
+export default function OpsBoard({
+  config,
+  initialQuery = '',
+  initialSelectedId = null,
+}: {
+  config: OpsBoardConfig;
+  initialQuery?: string;
+  initialSelectedId?: string | null;
+}) {
   const toast = useToast();
   const [rows, setRows] = useState(config.rows);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery);
   const [groupBy, setGroupBy] = useState(config.defaultGroup);
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
-  const [selected, setSelected] = useState<OpsRow | null>(null);
+  const [selected, setSelected] = useState<OpsRow | null>(
+    () => config.rows.find(row => row.id === initialSelectedId) ?? null,
+  );
   const [incidentFor, setIncidentFor] = useState<OpsRow | null>(null);
   const [incidentNote, setIncidentNote] = useState('');
 

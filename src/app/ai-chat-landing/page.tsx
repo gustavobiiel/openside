@@ -234,7 +234,11 @@ const composerTriggers = [mentionTrigger, commandTrigger];
 
 // Main component
 
-export default function AIChatTemplate() {
+export default function AIChatTemplate({
+  onStart,
+}: {
+  onStart?: (text: string) => void;
+}) {
   const [mode, setMode] = useState<string | null>('auto');
   const [category, setCategory] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<string[]>([
@@ -323,8 +327,8 @@ export default function AIChatTemplate() {
 
             {/* Composer */}
             <ChatComposer
-              onSubmit={() => {}}
-              placeholder="Ask anything"
+              onSubmit={text => onStart?.(text)}
+              placeholder="Pergunte à Meire..."
               input={
                 <ChatComposerInput
                   handleRef={composerInputRef}
