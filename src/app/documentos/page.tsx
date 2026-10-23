@@ -98,14 +98,15 @@ const LIBRARY_CODE = `<DropdownMenu
   }))}
 />`;
 
-const DASHBOARD_CODE = `function FlowChart({series}) {
-  return (
-    <svg className="fury-flow" role="img">
-      <path className="fury-flow-area" />
-      <path className="fury-flow-line" />
-    </svg>
-  );
-}`;
+const DASHBOARD_CODE = `<StatisticChartGroup
+  label="Expedição"
+  items={flows.map(flow => ({
+    id: flow.id,
+    title: flow.title,
+    series: flow.series,
+    suffix: flow.suffix,
+  }))}
+/>`;
 
 const FILTER_CODE = `<PowerSearch
   config={config}
@@ -426,7 +427,7 @@ export default function DocumentsPage() {
 
             <h3 id="areas">Áreas</h3>
             <ul>
-              <li><b>Expedição.</b> Carregamento, entregas, coleta e expedição e pedidos. A coleta começa pela placa. Com a placa válida, o operador informa doca, cordas e tapumes e entra no carregamento. A carga compartilhada respeita a ordem de chegada das lojas: quem chega antes ocupa o fundo do baú; quem chega por último fica na porta.</li>
+              <li><b>Expedição.</b> Carregamento, entregas, coleta e expedição e pedidos. A coleta abre com a viagem e o veículo já preenchidos pelo sistema. A carga compartilhada respeita a ordem de chegada das lojas: quem chega antes ocupa o fundo do baú; quem chega por último fica na porta.</li>
               <li><b>DCP.</b> Prevenção de perdas, monitoramento, rastreamento, ocorrências e SLA. Ocorrência, divergência e auditoria ficam no mesmo fluxo, com responsável e evidência quando o caso pede.</li>
               <li><b>Consolidação.</b> Movimentações e volumes reunidos antes da saída. O código de loja com três dígitos recebe o prefixo L; códigos maiores permanecem como estão.</li>
               <li><b>Frota.</b> Veículos, motoristas e rotas. Veículo ativo está em rota. Motorista ou rota parados ficam ociosos até a próxima saída.</li>
@@ -461,7 +462,7 @@ export default function DocumentsPage() {
 
             <h2 id="arquitetura">Arquitetura</h2>
             <p>
-              O aplicativo é uma aplicação Vite com três entradas HTML. React 19 renderiza as telas. O Modo Fury e esta documentação importam <code>@astryxdesign/core</code> e o tema neutro <code>@astryxdesign/theme-neutral</code>, com StyleX na compilação. Os ícones vêm do Heroicons. Os gráficos do monitoramento usam Recharts e ficam num pacote separado, carregado só quando o operador abre essa tela.
+              O aplicativo é uma aplicação Vite com três entradas HTML. React 19 renderiza as telas. O Modo Fury e esta documentação importam <code>@astryxdesign/core</code> e o tema neutro <code>@astryxdesign/theme-neutral</code>, com StyleX na compilação. Os ícones vêm do Heroicons. Os gráficos seguem o grupo de estatísticas ao vivo — título, valor e curva — e o monitoramento só carrega esse pacote quando o operador abre a tela.
             </p>
             <p>
               A sessão do Planck guarda o login e a página ativa. A sessão do Modo Fury guarda a autenticação e, no primeiro acesso, abre a apresentação da casca. O tema claro ou escuro desta documentação fica em <code>documentos-theme</code>. A troca de tela mostra uma barra de progresso no Planck e o <code>ScreenLoading</code> no Fury, para a área de conteúdo nunca ficar em branco.
@@ -515,7 +516,7 @@ export default function ScreenLoading() {
             <h2 id="paineis">Painéis e tabelas</h2>
             <h3 id="dashboard">Painel do pátio</h3>
             <p>
-              O <code>dashboard/page.tsx</code> abre com o embarque do pátio: placa, doca, destino, loja, motorista e status, atualizados sozinhos, no ritmo de um painel de aeroporto. Abaixo, cada área entra num <code>Card</code> com gráfico de área — número, variação e curva — distribuído num <code>Grid</code>. Os números usam o formato brasileiro.
+              O <code>dashboard/page.tsx</code> abre com o embarque do pátio: placa, doca, destino, loja, motorista e status, atualizados sozinhos, no ritmo de um painel de aeroporto. Abaixo, expedição, operação e capacidade entram no mesmo grupo de estatísticas: título, valor ao vivo e curva, com divisor que empilha quando a faixa fica estreita. Os números usam o formato brasileiro e seguem se movendo.
             </p>
             <DocCode label="dashboard/page.tsx" code={DASHBOARD_CODE} />
             <h3 id="filtros">Filtros da tabela</h3>
@@ -526,7 +527,7 @@ export default function ScreenLoading() {
 
             <h2 id="chat">Conversa</h2>
             <p>
-              A entrada da conversa, em <code>ai-chat-landing/page.tsx</code>, monta o <code>ChatComposer</code> com dois gatilhos. <code>@</code> menciona pessoas e <code>/</code> insere comandos como traduzir, buscar ou gerar código. A conversa da Meire, em <code>MeireThread.tsx</code>, continua com <code>ChatMessage</code>, mensagem de sistema e o mesmo campo de composição. A central de ajuda usa o mesmo desenho, com uma resposta curta para cada pergunta da operação.
+              A entrada da conversa, em <code>ai-chat-landing/page.tsx</code>, monta o <code>ChatComposer</code> com dois gatilhos. <code>@</code> menciona pessoas e <code>/</code> insere comandos como traduzir, buscar ou gerar código. A conversa da Meire, em <code>MeireThread.tsx</code>, mantém o mesmo campo e as mesmas bolhas. Ela consulta a operação, escreve a resposta aos poucos, mostra a hora e pode ser interrompida. A central de ajuda usa o mesmo desenho, com uma resposta curta para cada pergunta da operação.
             </p>
             <DocCode label="ai-chat-landing/page.tsx" code={CHAT_CODE} />
 

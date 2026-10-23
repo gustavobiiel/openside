@@ -18,14 +18,14 @@ const SCREEN_ROLES: Record<string, string> = {
   'Prevenção de perdas':
     'Registra ocorrências, divergências, auditoria e as evidências de perda.',
   Monitoramento:
-    'Acompanha ao vivo o pátio, as filas e o fluxo da expedição.',
+    'Recebe a conferência prestada antes do carregamento: tapume, cordas, doca, peso e lojas.',
   Rastreamento:
     'Mostra a posição em tempo real das cargas em trânsito.',
   Ocorrências:
     'Reúne atrasos, avarias, recusas e os demais eventos da viagem.',
   Entregas: 'Mostra o status das entregas: em rota, realizadas e pendências.',
   'Coleta e Expedição':
-    'Começa pela placa e segue para doca, cordas, tapumes e o carregamento.',
+    'Abre com a viagem e o veículo já preenchidos pelo sistema.',
   SLA: 'Mede prazo, OTIF e o cumprimento da janela de entrega.',
   Movimentações:
     'Consolida os pallets por loja antes da saída do centro de distribuição.',

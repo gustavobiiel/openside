@@ -1,15 +1,18 @@
 'use client';
 
-import {useEffect, useId, useRef, useState} from 'react';
-import type {KeyboardEvent, PointerEvent, ReactNode} from 'react';
-import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
+import {useEffect, useRef, useState} from 'react';
+import type {ReactNode} from 'react';
+import {VStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
-import {Grid} from '@astryxdesign/core/Grid';
 import {Badge} from '@astryxdesign/core/Badge';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Icon} from '@astryxdesign/core/Icon';
 import type {IconType} from '@astryxdesign/core/Icon';
+import {
+  StatisticChartGroup,
+  type StatisticChartItem,
+} from '../../components/StatisticChartGroup';
 import {
   CubeIcon,
   ShieldCheckIcon,
@@ -19,21 +22,10 @@ import {
   WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
 
-const POINTS = 32;
+const POINTS = 12;
 const WINDOW_MIN = 120;
 const YARD_MS = 2600;
-const FLOW_MS = 3200;
-
-const countFmt = new Intl.NumberFormat('pt-BR', {maximumFractionDigits: 0});
-const pctFmt = new Intl.NumberFormat('pt-BR', {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
-});
-const deltaFmt = new Intl.NumberFormat('pt-BR', {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
-  signDisplay: 'exceptZero',
-});
+const FLOW_MS = 1800;
 
 type YardStatus =
   | 'aguardando'
@@ -318,11 +310,23 @@ const FLOW_SEED: Array<
   },
 ];
 
-function formatValue(value: number, format: FlowFormat): string {
-  if (format === 'percent') {
-    return `${pctFmt.format(value)}%`;
-  }
-  return countFmt.format(Math.round(value));
+const CHART_GROUPS: Array<{label: string; ids: string[]}> = [
+  {label: 'Expedição', ids: ['volumes', 'fila', 'docas']},
+  {label: 'Operação', ids: ['dcp', 'consolidacao', 'frota']},
+  {label: 'Capacidade', ids: ['armazem', 'admin']},
+];
+
+function flowToStatistic(flow: Flow): StatisticChartItem {
+  const percent = flow.format === 'percent';
+  return {
+    id: flow.id,
+    title: flow.title,
+    series: flow.series,
+    precision: percent ? 1 : 0,
+    suffix: percent ? '%' : flow.id === 'docas' ? `/ ${flow.ceiling}` : undefined,
+    caption: flow.note,
+    icon: <Icon icon={flow.icon} size="sm" color="inherit" />,
+  };
 }
 
 function formatEta(eta: number): string {
@@ -374,44 +378,6 @@ function advanceFlow(flow: Flow): Flow {
     momentum,
     series: [...flow.series.slice(1), value],
   };
-}
-
-function trend(series: number[]): number {
-  const last = series[series.length - 1] ?? 0;
-  const prev = series[Math.max(0, series.length - 6)] ?? last;
-  if (prev === 0) {
-    return 0;
-  }
-  return ((last - prev) / Math.abs(prev)) * 100;
-}
-
-function signOf(delta: number): 'up' | 'down' | 'flat' {
-  if (delta > 0.05) {
-    return 'up';
-  }
-  if (delta < -0.05) {
-    return 'down';
-  }
-  return 'flat';
-}
-
-function pointLabel(index: number, total: number): string {
-  if (total <= 1 || index >= total - 1) {
-    return 'agora';
-  }
-  const mins = Math.round(((total - 1 - index) / (total - 1)) * WINDOW_MIN);
-  if (mins <= 0) {
-    return 'agora';
-  }
-  if (mins < 60) {
-    return `há ${mins} min`;
-  }
-  const hours = Math.floor(mins / 60);
-  const rest = mins % 60;
-  if (rest === 0) {
-    return `há ${hours} h`;
-  }
-  return `há ${hours} h ${rest} min`;
 }
 
 function seedYard(now = Date.now()): Vehicle[] {
@@ -521,40 +487,6 @@ function useNow(ms: number): Date {
   return now;
 }
 
-function useAnimatedSeries(series: number[]): number[] {
-  const [drawn, setDrawn] = useState(series);
-  const drawnRef = useRef(series);
-
-  useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const from = drawnRef.current;
-    if (reduce || from.length !== series.length) {
-      drawnRef.current = series;
-      setDrawn(series);
-      return;
-    }
-    if (from.every((value, index) => value === series[index])) {
-      return;
-    }
-    const start = performance.now();
-    let frame = 0;
-    const step = (now: number) => {
-      const t = Math.min(1, (now - start) / 680);
-      const eased = 1 - (1 - t) ** 3;
-      const next = series.map((value, index) => from[index] + (value - from[index]) * eased);
-      drawnRef.current = next;
-      setDrawn(next);
-      if (t < 1) {
-        frame = requestAnimationFrame(step);
-      }
-    };
-    frame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frame);
-  }, [series]);
-
-  return drawn;
-}
-
 function Flap({cue, children}: {cue: string; children: ReactNode}) {
   const seen = useRef(cue);
   const [tick, setTick] = useState(0);
@@ -574,239 +506,6 @@ function Flap({cue, children}: {cue: string; children: ReactNode}) {
   );
 }
 
-type Point = {x: number; y: number};
-
-function monotonePath(points: Point[]): string {
-  const count = points.length;
-  if (count === 0) {
-    return '';
-  }
-  if (count === 1) {
-    return `M ${points[0].x} ${points[0].y}`;
-  }
-  const slopes: number[] = [];
-  const dx: number[] = [];
-  for (let index = 0; index < count - 1; index += 1) {
-    dx[index] = points[index + 1].x - points[index].x || 1;
-    slopes[index] = (points[index + 1].y - points[index].y) / dx[index];
-  }
-  const tangent = new Array<number>(count);
-  tangent[0] = slopes[0];
-  tangent[count - 1] = slopes[count - 2];
-  for (let index = 1; index < count - 1; index += 1) {
-    tangent[index] =
-      slopes[index - 1] * slopes[index] <= 0 ? 0 : (slopes[index - 1] + slopes[index]) / 2;
-  }
-  for (let index = 0; index < count - 1; index += 1) {
-    if (Math.abs(slopes[index]) < 1e-6) {
-      tangent[index] = 0;
-      tangent[index + 1] = 0;
-      continue;
-    }
-    const a = tangent[index] / slopes[index];
-    const b = tangent[index + 1] / slopes[index];
-    const hypot = Math.hypot(a, b);
-    if (hypot > 3) {
-      const tau = 3 / hypot;
-      tangent[index] = tau * a * slopes[index];
-      tangent[index + 1] = tau * b * slopes[index];
-    }
-  }
-  let path = `M ${points[0].x} ${points[0].y}`;
-  for (let index = 0; index < count - 1; index += 1) {
-    const p0 = points[index];
-    const p1 = points[index + 1];
-    const span = dx[index];
-    const c1x = p0.x + span / 3;
-    const c1y = p0.y + (tangent[index] * span) / 3;
-    const c2x = p1.x - span / 3;
-    const c2y = p1.y - (tangent[index + 1] * span) / 3;
-    path += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p1.x} ${p1.y}`;
-  }
-  return path;
-}
-
-function FlowChart({
-  flow,
-  drawn,
-  hover,
-  onHover,
-}: {
-  flow: Flow;
-  drawn: number[];
-  hover: number | null;
-  onHover: (index: number | null) => void;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-  const gradientId = useId().replace(/:/g, '');
-  const height = flow.featured ? 220 : 136;
-  const active = hover ?? drawn.length - 1;
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) {
-      return;
-    }
-    const measure = () => setWidth(node.clientWidth);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
-  const lo = Math.min(...flow.series);
-  const hi = Math.max(...flow.series);
-  const dataSpan = Math.max(hi - lo, 1);
-  const y0 = lo - dataSpan * 0.45;
-  const y1 = hi + dataSpan * 0.6;
-  const padX = 6;
-  const padTop = 18;
-  const padBottom = 10;
-  const innerW = Math.max(width - padX * 2, 1);
-  const innerH = Math.max(height - padTop - padBottom, 1);
-  const points: Point[] =
-    width > 0
-      ? drawn.map((value, index) => ({
-          x: padX + (drawn.length === 1 ? innerW / 2 : (index / (drawn.length - 1)) * innerW),
-          y: padTop + (1 - (value - y0) / (y1 - y0 || 1)) * innerH,
-        }))
-      : [];
-  const line = monotonePath(points);
-  const first = points[0];
-  const last = points[points.length - 1];
-  const cursor = points[active];
-  const bottom = height - padBottom;
-  const area =
-    line && first && last ? `${line} L ${last.x} ${bottom} L ${first.x} ${bottom} Z` : '';
-  const shown = drawn[active] ?? drawn[drawn.length - 1] ?? 0;
-
-  const move = (event: PointerEvent<HTMLDivElement>) => {
-    if (drawn.length === 0) {
-      return;
-    }
-    const rect = event.currentTarget.getBoundingClientRect();
-    const ratio = (event.clientX - rect.left) / Math.max(rect.width, 1);
-    const index = Math.round(ratio * (drawn.length - 1));
-    onHover(Math.max(0, Math.min(drawn.length - 1, index)));
-  };
-
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
-      return;
-    }
-    event.preventDefault();
-    const base = hover ?? drawn.length - 1;
-    const delta = event.key === 'ArrowLeft' ? -1 : 1;
-    onHover(Math.max(0, Math.min(drawn.length - 1, base + delta)));
-  };
-
-  return (
-    <div>
-      <div
-        ref={ref}
-        className="fury-flow-plot"
-        style={{height}}
-        role="slider"
-        tabIndex={0}
-        aria-label={flow.title}
-        aria-valuemin={0}
-        aria-valuemax={Math.max(drawn.length - 1, 0)}
-        aria-valuenow={active}
-        aria-valuetext={`${formatValue(shown, flow.format)}, ${pointLabel(active, drawn.length)}`}
-        aria-orientation="horizontal"
-        onPointerMove={move}
-        onPointerLeave={() => onHover(null)}
-        onBlur={() => onHover(null)}
-        onKeyDown={onKeyDown}>
-        {width > 0 && points.length > 0 ? (
-          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
-            <defs>
-              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--color-data-categorical-purple)" stopOpacity="0.42" />
-                <stop offset="68%" stopColor="var(--color-data-categorical-purple)" stopOpacity="0.08" />
-                <stop offset="100%" stopColor="var(--color-data-categorical-purple)" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path d={area} fill={`url(#${gradientId})`} />
-            <path
-              d={line}
-              fill="none"
-              stroke="var(--color-data-categorical-purple)"
-              strokeWidth={2.5}
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
-            {hover != null && cursor ? (
-              <line
-                x1={cursor.x}
-                x2={cursor.x}
-                y1={padTop}
-                y2={bottom}
-                stroke="var(--color-data-categorical-purple)"
-                strokeOpacity={0.35}
-                strokeWidth={1}
-              />
-            ) : null}
-            {cursor ? (
-              <circle
-                cx={cursor.x}
-                cy={cursor.y}
-                r={flow.featured ? 5 : 4}
-                fill="var(--color-data-categorical-purple)"
-                stroke="var(--color-background-card)"
-                strokeWidth={2}
-              />
-            ) : null}
-          </svg>
-        ) : null}
-      </div>
-      <div className="fury-flow-axis" aria-hidden="true">
-        <span>há 2 h</span>
-        <span>há 1 h</span>
-        <span>agora</span>
-      </div>
-    </div>
-  );
-}
-
-function FlowCard({flow}: {flow: Flow}) {
-  const drawn = useAnimatedSeries(flow.series);
-  const [hover, setHover] = useState<number | null>(null);
-  const index = hover ?? drawn.length - 1;
-  const value = drawn[index] ?? drawn[drawn.length - 1] ?? 0;
-  const delta = trend(flow.series);
-  const sign = signOf(delta);
-
-  return (
-    <Card className={`fury-flow-card${flow.featured ? ' is-featured' : ''}`}>
-      <VStack gap={3}>
-        <HStack gap={3} vAlign="center">
-          <span className="fury-sector-icon" aria-hidden="true">
-            <Icon icon={flow.icon} size="sm" color="inherit" />
-          </span>
-          <VStack gap={0}>
-            <Text type="supporting" color="secondary">
-              {flow.sector}
-            </Text>
-            <Heading level={flow.featured ? 3 : 4}>{flow.title}</Heading>
-          </VStack>
-        </HStack>
-        <div className="fury-metric">
-          <span className="fury-metric-value">{formatValue(value, flow.format)}</span>
-          <span className="fury-metric-delta" data-sign={sign}>
-            {deltaFmt.format(delta)}%
-            <span className="fury-metric-delta-label"> no turno</span>
-          </span>
-        </div>
-        <Text type="supporting" color="secondary">
-          {hover == null ? flow.note : pointLabel(index, drawn.length)}
-        </Text>
-        <FlowChart flow={flow} drawn={drawn} hover={hover} onHover={setHover} />
-      </VStack>
-    </Card>
-  );
-}
 
 function YardBoard({
   vehicles,
@@ -990,9 +689,6 @@ export default function DashboardTemplate() {
     return () => window.clearInterval(id);
   }, []);
 
-  const featured = flows.find(flow => flow.featured);
-  const rest = flows.filter(flow => !flow.featured);
-
   return (
     <Layout
       height="fill"
@@ -1008,13 +704,21 @@ export default function DashboardTemplate() {
 
             <YardBoard vehicles={yard} fresh={fresh} now={now} />
 
-            {featured ? <FlowCard flow={featured} /> : null}
-
-            <Grid columns={{minWidth: 340}} gap={4}>
-              {rest.map(flow => (
-                <FlowCard key={flow.id} flow={flow} />
-              ))}
-            </Grid>
+            {CHART_GROUPS.map(group => {
+              const items = group.ids
+                .map(id => flows.find(flow => flow.id === id))
+                .filter((flow): flow is Flow => flow != null)
+                .map(flowToStatistic);
+              return (
+                <Card key={group.label} padding={0} className="stat-chart-shell">
+                  <StatisticChartGroup
+                    label={group.label}
+                    windowMinutes={WINDOW_MIN}
+                    items={items}
+                  />
+                </Card>
+              );
+            })}
           </VStack>
         </LayoutContent>
       }

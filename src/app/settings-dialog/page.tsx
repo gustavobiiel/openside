@@ -87,11 +87,18 @@ import {TextInput} from '@astryxdesign/core/TextInput';
 import {Theme} from '@astryxdesign/core/theme';
 import {neutralTheme} from '@astryxdesign/theme-neutral/built';
 import {Token} from '@astryxdesign/core/Token';
+import {
+  type FuryFont,
+  type FuryScheme,
+  type FuryVision,
+  useThemeMode,
+} from '../../fury/themeMode';
 import {Tooltip} from '@astryxdesign/core/Tooltip';
 import {VStack} from '@astryxdesign/core/VStack';
 import {
   ArrowDownOnSquareIcon,
   ArrowDownTrayIcon,
+  ArrowRightStartOnRectangleIcon,
   ArrowUturnLeftIcon,
   AtSymbolIcon,
   Bars3BottomLeftIcon,
@@ -363,76 +370,76 @@ interface PanelConfig {
  */
 const PANEL_GROUPS: {label: string; panels: PanelConfig[]}[] = [
   {
-    label: 'Account',
+    label: 'Conta',
     panels: [
       {
         id: 'profile',
-        label: 'Profile',
-        description: 'How you appear to everyone else in the workspace.',
+        label: 'Perfil',
+        description: 'Como você aparece para as outras pessoas da área de trabalho.',
         icon: UserCircleIcon,
       },
       {
         id: 'security',
-        label: 'Login & security',
-        description: 'Sign-in methods and the devices signed in right now.',
+        label: 'Login e segurança',
+        description: 'Formas de entrar e os dispositivos conectados agora.',
         icon: LockClosedIcon,
       },
       {
         id: 'billing',
-        label: 'Billing',
-        description: 'Your plan, seats, and where invoices are sent.',
+        label: 'Cobrança',
+        description: 'Seu plano, assentos e para onde as faturas são enviadas.',
         icon: CreditCardIcon,
       },
     ],
   },
   {
-    label: 'Workspace',
+    label: 'Área de trabalho',
     panels: [
       {
         id: 'appearance',
-        label: 'Appearance',
-        description: 'Theme and density for this browser.',
+        label: 'Aparência',
+        description: 'Tema e densidade neste navegador.',
         icon: PaintBrushIcon,
       },
       {
         id: 'notifications',
-        label: 'Notifications',
-        description: 'What reaches you, and where it arrives.',
+        label: 'Notificações',
+        description: 'O que chega até você e por onde chega.',
         icon: BellIcon,
       },
       {
         id: 'shortcuts',
-        label: 'Keyboard shortcuts',
-        description: 'Rebind or switch off any shortcut on this surface.',
+        label: 'Atalhos de teclado',
+        description: 'Troque ou desligue qualquer atalho desta tela.',
         icon: CommandLineIcon,
       },
       {
         id: 'language',
-        label: 'Language & region',
-        description: 'Language, formats, and time zone.',
+        label: 'Idioma e região',
+        description: 'Idioma, formatos e fuso horário.',
         icon: GlobeAltIcon,
       },
     ],
   },
   {
-    label: 'Advanced',
+    label: 'Avançado',
     panels: [
       {
         id: 'privacy',
-        label: 'Privacy',
-        description: 'What you share, and what we keep.',
+        label: 'Privacidade',
+        description: 'O que você compartilha e o que guardamos.',
         icon: ShieldCheckIcon,
       },
       {
         id: 'integrations',
-        label: 'Connected apps',
-        description: 'Services with access to this workspace.',
+        label: 'Apps conectados',
+        description: 'Serviços com acesso a esta área de trabalho.',
         icon: PuzzlePieceIcon,
       },
       {
         id: 'developer',
-        label: 'Developer',
-        description: 'API access and pre-release features.',
+        label: 'Desenvolvedor',
+        description: 'Acesso à API e recursos em pré-lançamento.',
         icon: CodeBracketIcon,
       },
     ],
@@ -479,86 +486,86 @@ interface SearchableSetting {
  */
 const SEARCHABLE_SETTINGS: SearchableSetting[] = [
   {
-    title: 'Display name',
-    description: 'The name shown on your posts and comments',
+    title: 'Nome de exibição',
+    description: 'O nome que aparece nas suas publicações e comentários',
     panel: 'profile',
     icon: UserCircleIcon,
   },
   {
-    title: 'Two-factor authentication',
-    description: 'Require a second step when signing in',
+    title: 'Autenticação em duas etapas',
+    description: 'Pede uma segunda etapa ao entrar',
     panel: 'security',
     icon: KeyIcon,
   },
   {
-    title: 'Active sessions',
-    description: 'Devices currently signed in to this account',
+    title: 'Sessões ativas',
+    description: 'Dispositivos conectados nesta conta agora',
     panel: 'security',
     icon: ComputerDesktopIcon,
   },
   {
-    title: 'Plan',
-    description: 'Your current subscription and seat count',
+    title: 'Plano',
+    description: 'Sua assinatura atual e a quantidade de assentos',
     panel: 'billing',
     icon: CreditCardIcon,
   },
   {
-    title: 'Color theme',
-    description: 'Light, dark, or follow the system',
+    title: 'Tema de cores',
+    description: 'Claro, escuro ou seguir o sistema',
     panel: 'appearance',
     icon: PaintBrushIcon,
   },
   {
-    title: 'Interface density',
-    description: 'How much breathing room rows and lists get',
+    title: 'Densidade da interface',
+    description: 'Quanto espaço as linhas e as listas recebem',
     panel: 'appearance',
     icon: PaintBrushIcon,
   },
   {
-    title: 'Email notifications',
-    description: 'Mentions, comments, and the weekly digest',
+    title: 'Notificações por e-mail',
+    description: 'Menções, comentários e o resumo semanal',
     panel: 'notifications',
     icon: EnvelopeIcon,
   },
   {
-    title: 'Quiet hours',
-    description: 'Hold desktop notifications until the morning',
+    title: 'Horário silencioso',
+    description: 'Segura as notificações da área de trabalho até de manhã',
     panel: 'notifications',
     icon: ClockIcon,
   },
   {
-    title: 'Keyboard shortcuts',
-    description: 'Rebind a shortcut, or switch one off',
+    title: 'Atalhos de teclado',
+    description: 'Troque um atalho ou desligue um',
     panel: 'shortcuts',
     icon: CommandLineIcon,
   },
   {
-    title: 'Time zone',
-    description: 'Used for scheduling and timestamps',
+    title: 'Fuso horário',
+    description: 'Usado na agenda e nos horários exibidos',
     panel: 'language',
     icon: GlobeAltIcon,
   },
   {
-    title: 'Read receipts',
-    description: 'Let people see when you have read a message',
+    title: 'Confirmação de leitura',
+    description: 'Mostra quando você leu uma mensagem',
     panel: 'privacy',
     icon: ShieldCheckIcon,
   },
   {
-    title: 'Export my data',
-    description: 'Download everything this account holds',
+    title: 'Exportar meus dados',
+    description: 'Baixa tudo o que esta conta guarda',
     panel: 'privacy',
     icon: ArrowDownTrayIcon,
   },
   {
-    title: 'Connected apps',
-    description: 'Calendar, storage, and chat integrations',
+    title: 'Apps conectados',
+    description: 'Integrações de agenda, arquivos e conversa',
     panel: 'integrations',
     icon: PuzzlePieceIcon,
   },
   {
-    title: 'API access',
-    description: 'Personal access tokens and webhooks',
+    title: 'Acesso à API',
+    description: 'Tokens de acesso pessoal e webhooks',
     panel: 'developer',
     icon: CodeBracketIcon,
   },
@@ -791,7 +798,7 @@ interface SettingsState {
 
 const INITIAL_SETTINGS: SettingsState = {
   displayName: 'Alex Johnson',
-  jobTitle: 'Product designer',
+  jobTitle: 'Designer de produto',
   pronouns: 'they',
   showLocalTime: true,
   presence: 'online',
@@ -809,10 +816,10 @@ const INITIAL_SETTINGS: SettingsState = {
   desktopAlerts: true,
   notificationSounds: false,
   quietHours: 'none',
-  language: 'en-US',
-  region: 'US',
-  timezone: 'PT',
-  weekStart: 'sun',
+  language: 'pt-BR',
+  region: 'BR',
+  timezone: 'BRT',
+  weekStart: 'mon',
   discoverable: true,
   readReceipts: true,
   activityStatus: false,
@@ -834,10 +841,10 @@ interface PanelProps {
 }
 
 const PRESENCE_STATUSES = [
-  {value: 'online', variant: 'success', label: 'Online'},
-  {value: 'away', variant: 'warning', label: 'Away'},
-  {value: 'offline', variant: 'error', label: 'Offline'},
-  {value: 'unknown', variant: 'neutral', label: 'Unknown'},
+  {value: 'online', variant: 'success', label: 'Conectado'},
+  {value: 'away', variant: 'warning', label: 'Ausente'},
+  {value: 'offline', variant: 'error', label: 'Desconectado'},
+  {value: 'unknown', variant: 'neutral', label: 'Desconhecido'},
 ] as const;
 
 function PresenceStatusList({
@@ -884,14 +891,14 @@ function PresenceStatusList({
 function ProfilePanel({settings, update}: PanelProps) {
   return (
     <VStack gap={5}>
-      <SettingsCard title="Identity">
+      <SettingsCard title="Identidade">
         <SettingsRow
-          title="Display name"
+          title="Nome de exibição"
           icon={UserIcon}
-          description="Shown on your posts, comments, and mentions."
+          description="Aparece nas suas publicações, comentários e menções."
           control={
             <TextInput
-              label="Display name"
+              label="Nome de exibição"
               isLabelHidden
               size="sm"
               width={CONTROL_WIDTH}
@@ -901,12 +908,12 @@ function ProfilePanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Job title"
+          title="Cargo"
           icon={BriefcaseIcon}
-          description="Appears under your name on your profile card."
+          description="Aparece abaixo do seu nome no cartão de perfil."
           control={
             <TextInput
-              label="Job title"
+              label="Cargo"
               isLabelHidden
               size="sm"
               width={CONTROL_WIDTH}
@@ -916,35 +923,35 @@ function ProfilePanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Pronouns"
+          title="Pronomes"
           icon={TagIcon}
           control={
             <Selector
-              label="Pronouns"
+              label="Pronomes"
               isLabelHidden
               size="sm"
               width={CONTROL_WIDTH}
               value={settings.pronouns}
               onChange={value => update('pronouns', value)}
               options={[
-                {value: 'none', label: 'Not specified'},
-                {value: 'they', label: 'they/them'},
-                {value: 'she', label: 'she/her'},
-                {value: 'he', label: 'he/him'},
+                {value: 'none', label: 'Não especificado'},
+                {value: 'they', label: 'elu/delu'},
+                {value: 'she', label: 'ela/dela'},
+                {value: 'he', label: 'ele/dele'},
               ]}
             />
           }
         />
       </SettingsCard>
 
-      <SettingsCard title="Availability">
+      <SettingsCard title="Disponibilidade">
         <SettingsRow
-          title="Show my local time"
+          title="Mostrar meu horário local"
           icon={ClockIcon}
-          description="Helps people across time zones pick a sane hour."
+          description="Ajuda quem está em outro fuso a escolher um horário adequado."
           control={
             <Switch
-              label="Show my local time"
+              label="Mostrar meu horário local"
               isLabelHidden
               value={settings.showLocalTime}
               onChange={value => update('showLocalTime', value)}
@@ -952,7 +959,7 @@ function ProfilePanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Presence"
+          title="Presença"
           icon={SignalIcon}
           control={<PresenceStatusList value={settings.presence} onChange={value => update('presence', value)} />}
         />
@@ -964,21 +971,21 @@ function ProfilePanel({settings, update}: PanelProps) {
 function SecurityPanel({settings, update}: PanelProps) {
   return (
     <VStack gap={5}>
-      <SettingsCard title="Sign-in">
+      <SettingsCard title="Entrada">
         <SettingsRow
-          title="Password"
-          description="Last changed 4 months ago."
+          title="Senha"
+          description="Alterada há 4 meses."
           icon={KeyIcon}
-          control={<Button label="Change" variant="secondary" size="sm" />}
+          control={<Button label="Alterar" variant="secondary" size="sm" />}
         />
         <SettingsRow
-          title="Two-factor authentication"
-          titleAccessory={<Token label="Recommended" size="sm" color="green" />}
-          description="Ask for a code from your authenticator app at sign-in."
+          title="Autenticação em duas etapas"
+          titleAccessory={<Token label="Recomendado" size="sm" color="green" />}
+          description="Pede um código do aplicativo autenticador ao entrar."
           icon={ShieldCheckIcon}
           control={
             <Switch
-              label="Two-factor authentication"
+              label="Autenticação em duas etapas"
               isLabelHidden
               value={settings.twoFactor}
               onChange={value => update('twoFactor', value)}
@@ -986,31 +993,31 @@ function SecurityPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Passkeys"
+          title="Chaves de acesso"
           icon={FingerPrintIcon}
-          description="No passkeys yet."
-          control={<Button label="Add passkey" variant="secondary" size="sm" />}
+          description="Nenhuma chave de acesso ainda."
+          control={<Button label="Adicionar chave" variant="secondary" size="sm" />}
         />
       </SettingsCard>
 
-      <SettingsCard title="Active sessions">
+      <SettingsCard title="Sessões ativas">
         <SettingsRow
           title="MacBook Pro · Chrome"
-          titleAccessory={<Token label="This device" size="sm" />}
-          description="San Francisco, California · Active now"
+          titleAccessory={<Token label="Este dispositivo" size="sm" />}
+          description="São Francisco, Califórnia · Ativo agora"
           icon={ComputerDesktopIcon}
         />
         <SettingsRow
           title="iPhone 15 · Safari"
-          description="San Francisco, California · 2 hours ago"
+          description="São Francisco, Califórnia · há 2 horas"
           icon={DevicePhoneMobileIcon}
-          control={<Button label="Sign out" variant="ghost" size="sm" />}
+          control={<Button label="Sair" variant="ghost" size="sm" />}
         />
         <SettingsRow
           title="Windows · Edge"
-          description="Austin, Texas · March 30 at 19:31"
+          description="Austin, Texas · 30 de março às 19:31"
           icon={ComputerDesktopIcon}
-          control={<Button label="Sign out" variant="ghost" size="sm" />}
+          control={<Button label="Sair" variant="ghost" size="sm" />}
         />
       </SettingsCard>
     </VStack>
@@ -1020,32 +1027,32 @@ function SecurityPanel({settings, update}: PanelProps) {
 function BillingPanel({settings, update}: PanelProps) {
   return (
     <VStack gap={5}>
-      <SettingsCard title="Plan">
+      <SettingsCard title="Plano">
         <SettingsRow
-          title="Current plan"
+          title="Plano atual"
           icon={CubeIcon}
-          titleAccessory={<Token label="Team" size="sm" color="blue" />}
-          description="$12 per seat, per month. Renews on April 1."
-          control={<Button label="Upgrade" variant="primary" size="sm" />}
+          titleAccessory={<Token label="Equipe" size="sm" color="blue" />}
+          description="US$ 12 por assento, por mês. Renova em 1º de abril."
+          control={<Button label="Fazer upgrade" variant="primary" size="sm" />}
         />
         <SettingsRow
-          title="Seats"
+          title="Assentos"
           icon={UsersIcon}
-          description="18 of 25 seats in use."
+          description="18 de 25 assentos em uso."
           control={
-            <Button label="Manage seats" variant="secondary" size="sm" />
+            <Button label="Gerenciar assentos" variant="secondary" size="sm" />
           }
         />
       </SettingsCard>
 
-      <SettingsCard title="Invoices">
+      <SettingsCard title="Faturas">
         <SettingsRow
-          title="Billing email"
+          title="E-mail de cobrança"
           icon={EnvelopeIcon}
-          description="Where receipts and payment failures are sent."
+          description="Para onde vão os recibos e as falhas de pagamento."
           control={
             <TextInput
-              label="Billing email"
+              label="E-mail de cobrança"
               isLabelHidden
               type="email"
               size="sm"
@@ -1056,12 +1063,12 @@ function BillingPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Email invoices"
+          title="Enviar faturas por e-mail"
           icon={ReceiptPercentIcon}
-          description="Send a PDF copy every time we charge the card."
+          description="Envia um PDF sempre que o cartão é cobrado."
           control={
             <Switch
-              label="Email invoices"
+              label="Enviar faturas por e-mail"
               isLabelHidden
               value={settings.emailInvoices}
               onChange={value => update('emailInvoices', value)}
@@ -1069,10 +1076,10 @@ function BillingPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Payment method"
-          description="Visa ending 4242 · Expires 09/28"
+          title="Forma de pagamento"
+          description="Visa final 4242 · Vence em 09/28"
           icon={CreditCardIcon}
-          control={<Button label="Update" variant="secondary" size="sm" />}
+          control={<Button label="Atualizar" variant="secondary" size="sm" />}
         />
       </SettingsCard>
     </VStack>
@@ -1169,11 +1176,11 @@ const THEME_CHOICES: {
   scheme: 'light' | 'dark' | 'system';
   icon: IconComponent;
 }[] = [
-  {value: 'light', label: 'Light', scheme: 'light', icon: SunIcon},
-  {value: 'dark', label: 'Dark', scheme: 'dark', icon: MoonIcon},
+  {value: 'light', label: 'Claro', scheme: 'light', icon: SunIcon},
+  {value: 'dark', label: 'Escuro', scheme: 'dark', icon: MoonIcon},
   {
     value: 'system',
-    label: 'System',
+    label: 'Sistema',
     scheme: 'system',
     icon: ComputerDesktopIcon,
   },
@@ -1218,7 +1225,7 @@ function ThemeChoiceCards({
   return (
     <Grid
       role="radiogroup"
-      aria-label="Color theme"
+      aria-label="Tema de cores"
       // Three across wherever three fit; below that the icon and the name stop
       // fitting the card, so the grid folds rather than drawing slivers.
       columns={{minWidth: 96, max: 3}}
@@ -1263,11 +1270,11 @@ function ThemeChoiceCards({
 }
 
 const INTERFACE_FONTS: {value: string; label: string; stack: string}[] = [
-  {value: 'system', label: 'System', stack: 'var(--font-family-body)'},
-  {value: 'serif', label: 'Serif', stack: 'Georgia, "Times New Roman", serif'},
+  {value: 'system', label: 'Sistema', stack: 'var(--font-family-body)'},
+  {value: 'serif', label: 'Serifada', stack: 'Georgia, "Times New Roman", serif'},
   {
     value: 'mono',
-    label: 'Monospace',
+    label: 'Monoespaçada',
     stack: 'var(--font-family-code)',
   },
 ];
@@ -1302,104 +1309,142 @@ function FontPreview({value}: {value: string}) {
     // line up with each other and with the row titles above them.
     <Card padding={3} width="100%">
       <VStack gap={1} style={faceStyle(font.stack)}>
-        <Text type="label">Weekly digest</Text>
+        <Text type="label">Resumo semanal</Text>
         <Text type="supporting" color="secondary">
-          Eight threads moved while you were away, and three are waiting on you.
+          Oito conversas andaram enquanto você estava fora, e três esperam por você.
         </Text>
       </VStack>
     </Card>
   );
 }
 
+const VISION_OPTIONS: {value: FuryVision; label: string}[] = [
+  {value: 'typical', label: 'Visão típica'},
+  {value: 'protanopia', label: 'Protanopia'},
+  {value: 'protanomaly', label: 'Protanomalia'},
+  {value: 'deuteranopia', label: 'Deuteranopia'},
+  {value: 'deuteranomaly', label: 'Deuteranomalia'},
+  {value: 'tritanopia', label: 'Tritanopia'},
+  {value: 'tritanomaly', label: 'Tritanomalia'},
+  {value: 'achromatopsia', label: 'Acromatopsia'},
+];
+
 function AppearancePanel({settings, update}: PanelProps) {
+  const {
+    preference,
+    setPreference,
+    vision,
+    setVision,
+    font,
+    setFont,
+    reduceMotion,
+    setReduceMotion,
+  } = useThemeMode();
+
   return (
     <VStack gap={5}>
       {/* Unlabelled on purpose: a "Theme" heading under an "Appearance" title
           says the same word twice. */}
       <SettingsCard>
         <SettingsRow
-          title="Color theme"
+          title="Tema de cores"
           icon={PaintBrushIcon}
-          description="Applies to this browser only."
+          description="Claro, escuro ou o mesmo tema do sistema. Vale só neste navegador."
           detail={
             <ThemeChoiceCards
-              value={settings.theme}
-              onChange={value => update('theme', value)}
+              value={preference}
+              onChange={value => setPreference(value as FuryScheme)}
             />
           }
         />
         <SettingsRow
-          title="Accent color"
-          icon={SwatchIcon}
-          description="Used for links, selection, and primary buttons."
+          title="Daltonismo"
+          icon={EyeIcon}
+          description="Recolore só avisos e ícones, no eixo que cada tipo ainda distingue. Protanopia e deuteranopia puxam para azul e amarelo; tritanopia, para vermelho e verde. A anomalia faz o mesmo ajuste, mais curto. Acromatopsia troca a cor por tons de cinza."
           control={
             <Selector
-              label="Accent color"
+              label="Daltonismo"
+              isLabelHidden
+              size="sm"
+              width={CONTROL_WIDTH}
+              value={vision}
+              onChange={value => setVision(value as FuryVision)}
+              options={VISION_OPTIONS}
+            />
+          }
+        />
+        <SettingsRow
+          title="Cor de destaque"
+          icon={SwatchIcon}
+          description="Usada em links, seleção e botões principais."
+          control={
+            <Selector
+              label="Cor de destaque"
               isLabelHidden
               size="sm"
               width={CONTROL_WIDTH}
               value={settings.accent}
               onChange={value => update('accent', value)}
               options={[
-                {value: 'blue', label: 'Blue'},
-                {value: 'teal', label: 'Teal'},
-                {value: 'purple', label: 'Purple'},
-                {value: 'orange', label: 'Orange'},
+                {value: 'blue', label: 'Azul'},
+                {value: 'teal', label: 'Verde-azulado'},
+                {value: 'purple', label: 'Roxo'},
+                {value: 'orange', label: 'Laranja'},
               ]}
             />
           }
         />
       </SettingsCard>
 
-      <SettingsCard title="Typography">
+      <SettingsCard title="Tipografia">
         <SettingsRow
-          title="Interface font"
+          title="Fonte da interface"
           icon={DocumentTextIcon}
-          description="Menus, labels, and message text."
+          description="Menus, rótulos e texto das mensagens."
           control={
             <Selector
-              label="Interface font"
+              label="Fonte da interface"
               isLabelHidden
               size="sm"
               width={CONTROL_WIDTH}
-              value={settings.font}
-              onChange={value => update('font', value)}
+              value={font}
+              onChange={value => setFont(value as FuryFont)}
               options={INTERFACE_FONTS.map(font => ({
                 value: font.value,
                 label: font.label,
               }))}
             />
           }
-          detail={<FontPreview value={settings.font} />}
+          detail={<FontPreview value={font} />}
         />
       </SettingsCard>
 
       <SettingsCard title="Layout">
         <SettingsRow
-          title="Interface density"
+          title="Densidade da interface"
           icon={Bars3Icon}
-          description="How much breathing room rows and lists get."
+          description="Quanto espaço as linhas e as listas recebem."
           control={
             <SegmentedControl
-              label="Interface density"
+              label="Densidade da interface"
               size="sm"
               value={settings.density}
               onChange={value => update('density', value)}>
-              <SegmentedControlItem value="comfortable" label="Comfortable" />
-              <SegmentedControlItem value="compact" label="Compact" />
+              <SegmentedControlItem value="comfortable" label="Confortável" />
+              <SegmentedControlItem value="compact" label="Compacta" />
             </SegmentedControl>
           }
         />
         <SettingsRow
-          title="Reduce motion"
+          title="Reduzir movimento"
           icon={HandRaisedIcon}
-          description="Skip transitions and animated transforms."
+          description="Desliga as transições e animações de todo o sistema."
           control={
             <Switch
-              label="Reduce motion"
+              label="Reduzir movimento"
               isLabelHidden
-              value={settings.reduceMotion}
-              onChange={value => update('reduceMotion', value)}
+              value={reduceMotion}
+              onChange={setReduceMotion}
             />
           }
         />
@@ -1411,14 +1456,14 @@ function AppearancePanel({settings, update}: PanelProps) {
 function NotificationsPanel({settings, update}: PanelProps) {
   return (
     <VStack gap={5}>
-      <SettingsCard title="Email">
+      <SettingsCard title="E-mail">
         <SettingsRow
-          title="Mentions"
-          description="Someone types your name."
+          title="Menções"
+          description="Alguém escreve o seu nome."
           icon={AtSymbolIcon}
           control={
             <Switch
-              label="Email me about mentions"
+              label="Receber e-mail sobre menções"
               isLabelHidden
               value={settings.emailMentions}
               onChange={value => update('emailMentions', value)}
@@ -1426,12 +1471,12 @@ function NotificationsPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Comments"
-          description="Replies on threads you are part of."
+          title="Comentários"
+          description="Respostas em conversas das quais você participa."
           icon={ChatBubbleLeftRightIcon}
           control={
             <Switch
-              label="Email me about comments"
+              label="Receber e-mail sobre comentários"
               isLabelHidden
               value={settings.emailComments}
               onChange={value => update('emailComments', value)}
@@ -1439,12 +1484,12 @@ function NotificationsPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Weekly digest"
-          description="One summary every Monday morning."
+          title="Resumo semanal"
+          description="Um resumo toda segunda de manhã."
           icon={EnvelopeIcon}
           control={
             <Switch
-              label="Send the weekly digest"
+              label="Enviar o resumo semanal"
               isLabelHidden
               value={settings.weeklyDigest}
               onChange={value => update('weeklyDigest', value)}
@@ -1453,14 +1498,14 @@ function NotificationsPanel({settings, update}: PanelProps) {
         />
       </SettingsCard>
 
-      <SettingsCard title="Desktop">
+      <SettingsCard title="Neste computador">
         <SettingsRow
-          title="Desktop notifications"
+          title="Notificações da área de trabalho"
           icon={ComputerDesktopIcon}
-          description="Requires permission from your browser."
+          description="Precisa da permissão do navegador."
           control={
             <Switch
-              label="Desktop notifications"
+              label="Notificações da área de trabalho"
               isLabelHidden
               value={settings.desktopAlerts}
               onChange={value => update('desktopAlerts', value)}
@@ -1468,11 +1513,11 @@ function NotificationsPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Play a sound"
+          title="Tocar um som"
           icon={SpeakerWaveIcon}
           control={
             <Switch
-              label="Play a sound"
+              label="Tocar um som"
               isLabelHidden
               value={settings.notificationSounds}
               onChange={value => update('notificationSounds', value)}
@@ -1480,19 +1525,19 @@ function NotificationsPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Quiet hours"
-          description="Hold notifications and deliver them in the morning."
+          title="Horário silencioso"
+          description="Segura as notificações e entrega de manhã."
           icon={ClockIcon}
           control={
             <Selector
-              label="Quiet hours"
+              label="Horário silencioso"
               isLabelHidden
               size="sm"
               width={CONTROL_WIDTH}
               value={settings.quietHours}
               onChange={value => update('quietHours', value)}
               options={[
-                {value: 'none', label: 'Off'},
+                {value: 'none', label: 'Desligado'},
                 {value: 'evening', label: '18:00 – 09:00'},
                 {value: 'night', label: '22:00 – 07:00'},
               ]}
@@ -1526,37 +1571,37 @@ interface ShortcutDef {
 const SHORTCUTS: ShortcutDef[] = [
   {
     id: 'search',
-    label: 'Search everything',
+    label: 'Buscar em tudo',
     icon: MagnifyingGlassIcon,
     binding: {mod: true, key: 'k'},
   },
   {
     id: 'new',
-    label: 'New item',
+    label: 'Novo item',
     icon: PencilSquareIcon,
     binding: {mod: true, key: 'n'},
   },
   {
     id: 'save',
-    label: 'Save',
+    label: 'Salvar',
     icon: ArrowDownOnSquareIcon,
     binding: {mod: true, key: 's'},
   },
   {
     id: 'settings',
-    label: 'Open settings',
+    label: 'Abrir configurações',
     icon: Cog6ToothIcon,
     binding: {mod: true, key: ','},
   },
   {
     id: 'sidebar',
-    label: 'Toggle the sidebar',
+    label: 'Mostrar ou ocultar a barra lateral',
     icon: Bars3BottomLeftIcon,
     binding: {mod: true, shift: true, key: 'b'},
   },
   {
     id: 'help',
-    label: 'Shortcut cheat sheet',
+    label: 'Lista de atalhos',
     icon: QuestionMarkCircleIcon,
     binding: {shift: true, key: '?'},
   },
@@ -1666,9 +1711,9 @@ function ShortcutRecorder({
     <TextInput
       // A real label rather than leaning on the placeholder: the placeholder is
       // not an accessible name, and this control has no visible one of its own.
-      label="Type a shortcut"
+      label="Digite um atalho"
       isLabelHidden
-      placeholder="Type it"
+      placeholder="Digite"
       size="sm"
       width={RECORDER_WIDTH}
       value=""
@@ -1706,7 +1751,7 @@ function ShortcutRow({
         <HStack gap={2} align="center">
           {isCustom && (
             <IconButton
-              label={`Reset ${def.label} to its default`}
+              label={`Restaurar ${def.label} ao padrão`}
               icon={<Icon icon={ArrowUturnLeftIcon} size="sm" />}
               variant="ghost"
               size="sm"
@@ -1729,7 +1774,7 @@ function ShortcutRow({
               // makes `label` the `aria-label` as soon as there are children,
               // so the keycaps are what you see and the chord is what a screen
               // reader says.
-              label={isEnabled ? chordLabel(chord) : 'No shortcut'}
+              label={isEnabled ? chordLabel(chord) : 'Sem atalho'}
               // Ghost, not secondary: `Kbd` fills its own keycaps from the same
               // neutral token a secondary button fills with, so a filled button
               // around them is a chip inside a chip in one flat grey. The
@@ -1738,7 +1783,7 @@ function ShortcutRow({
               size="sm"
               isDisabled={!isEnabled}
               tooltip={
-                isEnabled ? 'Click to change' : 'Switch it on to rebind it'
+                isEnabled ? 'Clique para alterar' : 'Ligue para trocar o atalho'
               }
               onClick={() => {
                 setIsRecording(true);
@@ -1746,7 +1791,7 @@ function ShortcutRow({
               {isEnabled ? <Kbd keys={chordKeys(chord)} /> : undefined}
             </Button>
           )}
-          <Tooltip content={isEnabled ? 'Disable' : 'Enable'}>
+          <Tooltip content={isEnabled ? 'Desligar' : 'Ligar'}>
             <Switch
               size="sm"
               label={`${def.label} shortcut`}
@@ -1787,7 +1832,7 @@ function ShortcutsPanel() {
   };
 
   return (
-    <SettingsCard title="Shortcuts">
+    <SettingsCard title="Atalhos">
       {SHORTCUTS.map(def => {
         const resolved = resolve(def);
         const isEnabled = resolved !== false;
@@ -1824,7 +1869,7 @@ function ShortcutsPanel() {
         <VStack padding={ROW_PADDING}>
           <HStack>
             <Button
-              label="Reset all to defaults"
+              label="Restaurar todos os padrões"
               variant="ghost"
               size="sm"
               icon={<Icon icon={ArrowUturnLeftIcon} size="sm" />}
@@ -1841,57 +1886,59 @@ function ShortcutsPanel() {
 
 function LanguagePanel({settings, update}: PanelProps) {
   return (
-    <SettingsCard title="Language & region">
+    <SettingsCard title="Idioma e região">
       <SettingsRow
-        title="Language"
+        title="Idioma"
         icon={LanguageIcon}
-        description="Used across menus, buttons, and email."
+        description="Usado em menus, botões e e-mails."
         control={
           <Selector
-            label="Language"
+            label="Idioma"
             isLabelHidden
             size="sm"
             width={CONTROL_WIDTH}
             value={settings.language}
             onChange={value => update('language', value)}
             options={[
-              {value: 'en-US', label: 'English (US)'},
-              {value: 'en-GB', label: 'English (UK)'},
-              {value: 'fr', label: 'Français'},
-              {value: 'de', label: 'Deutsch'},
-              {value: 'ja', label: '日本語'},
+              {value: 'pt-BR', label: 'Português (Brasil)'},
+              {value: 'en-US', label: 'Inglês (EUA)'},
+              {value: 'en-GB', label: 'Inglês (Reino Unido)'},
+              {value: 'fr', label: 'Francês'},
+              {value: 'de', label: 'Alemão'},
+              {value: 'ja', label: 'Japonês'},
             ]}
           />
         }
       />
       <SettingsRow
-        title="Region format"
+        title="Formato regional"
         icon={MapPinIcon}
-        description="Dates, numbers, and currency."
+        description="Datas, números e moeda."
         control={
           <Selector
-            label="Region format"
+            label="Formato regional"
             isLabelHidden
             size="sm"
             width={CONTROL_WIDTH}
             value={settings.region}
             onChange={value => update('region', value)}
             options={[
-              {value: 'US', label: 'United States'},
-              {value: 'GB', label: 'United Kingdom'},
-              {value: 'DE', label: 'Germany'},
-              {value: 'JP', label: 'Japan'},
+              {value: 'BR', label: 'Brasil'},
+              {value: 'US', label: 'Estados Unidos'},
+              {value: 'GB', label: 'Reino Unido'},
+              {value: 'DE', label: 'Alemanha'},
+              {value: 'JP', label: 'Japão'},
             ]}
           />
         }
       />
       <SettingsRow
-        title="Time zone"
+        title="Fuso horário"
         icon={GlobeAltIcon}
-        description="Used for scheduling and every timestamp you see."
+        description="Usado na agenda e em todos os horários que você vê."
         control={
           <Selector
-            label="Time zone"
+            label="Fuso horário"
             isLabelHidden
             size="sm"
             width={CONTROL_WIDTH}
@@ -1902,26 +1949,27 @@ function LanguagePanel({settings, update}: PanelProps) {
               // starts with the same five characters and the list can only be
               // read to its end — and the longest of them then truncates
               // inside the control column.
-              {value: 'PT', label: 'Pacific (GMT-08:00)'},
-              {value: 'MT', label: 'Mountain (GMT-07:00)'},
+              {value: 'BRT', label: 'Brasília (GMT-03:00)'},
+              {value: 'PT', label: 'Pacífico (GMT-08:00)'},
+              {value: 'MT', label: 'Montanhas (GMT-07:00)'},
               {value: 'CT', label: 'Central (GMT-06:00)'},
-              {value: 'ET', label: 'Eastern (GMT-05:00)'},
+              {value: 'ET', label: 'Leste (GMT-05:00)'},
               {value: 'UTC', label: 'UTC (GMT+00:00)'},
             ]}
           />
         }
       />
       <SettingsRow
-        title="Start the week on"
+        title="Começar a semana em"
         icon={CalendarDaysIcon}
         control={
           <SegmentedControl
-            label="Start the week on"
+            label="Começar a semana em"
             size="sm"
             value={settings.weekStart}
             onChange={value => update('weekStart', value)}>
-            <SegmentedControlItem value="sun" label="Sunday" />
-            <SegmentedControlItem value="mon" label="Monday" />
+            <SegmentedControlItem value="sun" label="Domingo" />
+            <SegmentedControlItem value="mon" label="Segunda" />
           </SegmentedControl>
         }
       />
@@ -1932,14 +1980,14 @@ function LanguagePanel({settings, update}: PanelProps) {
 function PrivacyPanel({settings, update}: PanelProps) {
   return (
     <VStack gap={5}>
-      <SettingsCard title="Visibility">
+      <SettingsCard title="Visibilidade">
         <SettingsRow
-          title="Discoverable by email"
+          title="Encontrar pelo e-mail"
           icon={MagnifyingGlassIcon}
-          description="Let people find your profile by searching your address."
+          description="Permite que encontrem seu perfil buscando o seu e-mail."
           control={
             <Switch
-              label="Discoverable by email"
+              label="Encontrar pelo e-mail"
               isLabelHidden
               value={settings.discoverable}
               onChange={value => update('discoverable', value)}
@@ -1947,12 +1995,12 @@ function PrivacyPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Read receipts"
+          title="Confirmação de leitura"
           icon={EyeIcon}
-          description="Show people when you have read their message."
+          description="Mostra quando você leu a mensagem."
           control={
             <Switch
-              label="Read receipts"
+              label="Confirmação de leitura"
               isLabelHidden
               value={settings.readReceipts}
               onChange={value => update('readReceipts', value)}
@@ -1960,12 +2008,12 @@ function PrivacyPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Activity status"
+          title="Status de atividade"
           icon={SignalIcon}
-          description="Show a green dot while you are online."
+          description="Mostra um ponto verde enquanto você está online."
           control={
             <Switch
-              label="Activity status"
+              label="Status de atividade"
               isLabelHidden
               value={settings.activityStatus}
               onChange={value => update('activityStatus', value)}
@@ -1974,14 +2022,14 @@ function PrivacyPanel({settings, update}: PanelProps) {
         />
       </SettingsCard>
 
-      <SettingsCard title="Your data">
+      <SettingsCard title="Seus dados">
         <SettingsRow
-          title="Personalized suggestions"
-          description="Use your activity to rank what you see first."
+          title="Sugestões personalizadas"
+          description="Usa sua atividade para ordenar o que aparece primeiro."
           icon={SparklesIcon}
           control={
             <Switch
-              label="Personalized suggestions"
+              label="Sugestões personalizadas"
               isLabelHidden
               value={settings.personalization}
               onChange={value => update('personalization', value)}
@@ -1989,18 +2037,18 @@ function PrivacyPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Export my data"
-          description="We will email a download link within 24 hours."
+          title="Exportar meus dados"
+          description="Enviaremos um link de download por e-mail em até 24 horas."
           icon={ArrowDownTrayIcon}
           control={
-            <Button label="Request export" variant="secondary" size="sm" />
+            <Button label="Solicitar exportação" variant="secondary" size="sm" />
           }
         />
         <SettingsRow
-          title="Delete my account"
-          description="Permanent, and it takes the workspace with it."
+          title="Excluir minha conta"
+          description="É permanente e leva a área de trabalho junto."
           icon={TrashIcon}
-          control={<Button label="Delete" variant="destructive" size="sm" />}
+          control={<Button label="Excluir" variant="destructive" size="sm" />}
         />
       </SettingsCard>
     </VStack>
@@ -2009,24 +2057,24 @@ function PrivacyPanel({settings, update}: PanelProps) {
 
 function IntegrationsPanel() {
   return (
-    <SettingsCard title="Connected apps">
+    <SettingsCard title="Apps conectados">
       <SettingsRow
-        title="Calendar"
-        description="Connected as alex@example.com"
+        title="Agenda"
+        description="Conectado como alex@example.com"
         icon={CalendarDaysIcon}
-        control={<Button label="Disconnect" variant="ghost" size="sm" />}
+        control={<Button label="Desconectar" variant="ghost" size="sm" />}
       />
       <SettingsRow
-        title="File storage"
-        description="Attach files straight from your drive."
+        title="Arquivos"
+        description="Anexe arquivos direto do seu drive."
         icon={FolderIcon}
-        control={<Button label="Connect" variant="secondary" size="sm" />}
+        control={<Button label="Conectar" variant="secondary" size="sm" />}
       />
       <SettingsRow
-        title="Chat"
-        description="Post updates to a channel when work ships."
+        title="Conversa"
+        description="Publica atualizações em um canal quando o trabalho é concluído."
         icon={ChatBubbleLeftRightIcon}
-        control={<Button label="Connect" variant="secondary" size="sm" />}
+        control={<Button label="Conectar" variant="secondary" size="sm" />}
       />
     </SettingsCard>
   );
@@ -2037,12 +2085,12 @@ function DeveloperPanel({settings, update}: PanelProps) {
     <VStack gap={5}>
       <SettingsCard title="API">
         <SettingsRow
-          title="API access"
-          description="Issue tokens that act on your behalf."
+          title="Acesso à API"
+          description="Emite tokens que agem em seu nome."
           icon={CodeBracketIcon}
           control={
             <Switch
-              label="API access"
+              label="Acesso à API"
               isLabelHidden
               value={settings.apiAccess}
               onChange={value => update('apiAccess', value)}
@@ -2050,12 +2098,12 @@ function DeveloperPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Webhook URL"
+          title="URL do webhook"
           icon={LinkIcon}
-          description="We POST an event here whenever something changes."
+          description="Enviamos um evento aqui sempre que algo muda."
           control={
             <TextInput
-              label="Webhook URL"
+              label="URL do webhook"
               isLabelHidden
               size="sm"
               width={CONTROL_WIDTH}
@@ -2068,15 +2116,15 @@ function DeveloperPanel({settings, update}: PanelProps) {
         />
       </SettingsCard>
 
-      <SettingsCard title="Pre-release">
+      <SettingsCard title="Pré-lançamento">
         <SettingsRow
-          title="Early access features"
+          title="Recursos de acesso antecipado"
           icon={BeakerIcon}
           titleAccessory={<Token label="Beta" size="sm" color="purple" />}
-          description="Unfinished work, turned on for your account only."
+          description="Trabalho inacabado, ligado só na sua conta."
           control={
             <Switch
-              label="Early access features"
+              label="Recursos de acesso antecipado"
               isLabelHidden
               value={settings.earlyAccess}
               onChange={value => update('earlyAccess', value)}
@@ -2084,12 +2132,12 @@ function DeveloperPanel({settings, update}: PanelProps) {
           }
         />
         <SettingsRow
-          title="Verbose logging"
+          title="Registro detalhado"
           icon={DocumentMagnifyingGlassIcon}
-          description="Write a detailed trace to the browser console."
+          description="Grava um rastreamento detalhado no console do navegador."
           control={
             <Switch
-              label="Verbose logging"
+              label="Registro detalhado"
               isLabelHidden
               value={settings.verboseLogging}
               onChange={value => update('verboseLogging', value)}
@@ -2222,9 +2270,9 @@ function SettingsSearchResults({
   if (results.length === 0) {
     return (
       <VStack id="settings-search-results" gap={0.5} padding={2}>
-        <Text type="label">No settings found</Text>
+        <Text type="label">Nenhuma configuração encontrada</Text>
         <Text type="supporting" color="secondary">
-          Try theme, notifications, or sessions.
+          Tente tema, notificações ou sessões.
         </Text>
       </VStack>
     );
@@ -2244,7 +2292,7 @@ function SettingsSearchResults({
       gap={0}
       id="settings-search-results"
       role="listbox"
-      aria-label="Search results"
+      aria-label="Resultados da busca"
       isScrollable>
       {results.map((setting, index) => (
         <ListItem
@@ -2278,9 +2326,9 @@ function SettingsSearchResults({
 function SettingsSearchInput({search}: {search: SettingsSearch}) {
   return (
     <TextInput
-      label="Search settings"
+      label="Buscar configurações"
       isLabelHidden
-      placeholder="Search settings"
+      placeholder="Buscar configurações"
       size="sm"
       // Search is a region control, not a settings-row control. The row fields
       // deliberately share `CONTROL_WIDTH`; applying that same 192px budget
@@ -2318,15 +2366,17 @@ function SettingsSideNav({
   search,
   activePanel,
   onSelectPanel,
+  onLogout,
 }: {
   titleId: string;
   search: SettingsSearch;
   activePanel: PanelId;
   onSelectPanel: (panel: PanelId) => void;
+  onLogout?: () => void;
 }) {
   return (
     <SideNav
-      aria-label="Settings sections"
+      aria-label="Seções de configurações"
       xstyle={styles.sideNav}
       // Hand-composed rather than `SideNavHeading`, whose `heading` is typed
       // `string` and pinned to the large text size — a step above heading-4,
@@ -2338,11 +2388,26 @@ function SettingsSideNav({
           {/* Also the dialog's accessible name (`aria-labelledby`), so the
               painted title and the announced one cannot drift apart. */}
           <Heading level={4} id={titleId}>
-            Settings
+            Configurações
           </Heading>
         </HStack>
       }
-      topContent={<SettingsSearchInput search={search} />}>
+      topContent={<SettingsSearchInput search={search} />}
+      footer={
+        onLogout ? (
+          <SideNavSection title="Sessão" isHeaderHidden>
+            <SideNavItem
+              label="Fazer logout da conta"
+              icon={ArrowRightStartOnRectangleIcon}
+              href="#"
+              onClick={event => {
+                event.preventDefault();
+                onLogout();
+              }}
+            />
+          </SideNavSection>
+        ) : undefined
+      }>
       {search.isActive ? (
         <SettingsSearchResults
           results={search.results}
@@ -2416,7 +2481,7 @@ function SettingsContentPane({
       <HStack width="100%" justify="end" xstyle={styles.closeAnchor}>
         <HStack xstyle={styles.closeBacking}>
           <IconButton
-            label="Close"
+            label="Fechar"
             variant="ghost"
             size="sm"
             icon={<Icon icon="close" size="sm" />}
@@ -2458,7 +2523,7 @@ function SettingsPanelTabs({
   return (
     <HStack
       as="nav"
-      aria-label="Settings sections"
+      aria-label="Seções de configurações"
       gap={1}
       wrap="nowrap"
       isScrollable
@@ -2497,12 +2562,14 @@ function SettingsNarrowShell({
   update,
   onSelectPanel,
   onClose,
+  onLogout,
 }: {
   titleId: string;
   search: SettingsSearch;
   activePanel: PanelId;
   onSelectPanel: (panel: PanelId) => void;
   onClose: () => void;
+  onLogout?: () => void;
 } & PanelProps) {
   return (
     <VStack gap={0} height="100%">
@@ -2512,11 +2579,11 @@ function SettingsNarrowShell({
               not the head of a navigation column, so it stays a label — the
               phone layout's only heading should be the panel's own. */}
           <Text type="label" id={titleId}>
-            Settings
+            Configurações
           </Text>
         </StackItem>
         <IconButton
-          label="Close"
+          label="Fechar"
           variant="ghost"
           size="sm"
           icon={<Icon icon="close" size="sm" />}
@@ -2562,6 +2629,19 @@ function SettingsNarrowShell({
           </StackItem>
         </>
       )}
+      {onLogout ? (
+        <>
+          <Divider />
+          <VStack padding={3}>
+            <Button
+              label="Fazer logout da conta"
+              variant="secondary"
+              icon={<Icon icon={ArrowRightStartOnRectangleIcon} size="sm" />}
+              onClick={onLogout}
+            />
+          </VStack>
+        </>
+      ) : null}
     </VStack>
   );
 }
@@ -2573,8 +2653,10 @@ function SettingsNarrowShell({
  */
 export default function SettingsDialogTemplate({
   onClose = noop,
+  onLogout,
 }: {
   onClose?: () => void;
+  onLogout?: () => void;
 } = {}) {
   const [activePanel, setActivePanel] = useState<PanelId>(DEFAULT_PANEL);
   const [settings, setSettings] = useState<SettingsState>(INITIAL_SETTINGS);
@@ -2609,6 +2691,7 @@ export default function SettingsDialogTemplate({
           update={update}
           onSelectPanel={selectPanel}
           onClose={onClose}
+          onLogout={onLogout}
         />
       ) : (
         <Layout
@@ -2619,6 +2702,7 @@ export default function SettingsDialogTemplate({
               search={search}
               activePanel={activePanel}
               onSelectPanel={selectPanel}
+              onLogout={onLogout}
             />
           }
           content={

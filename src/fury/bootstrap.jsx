@@ -31,10 +31,15 @@ function FuryApp() {
     setIsAuthenticated(true)
   }
 
+  const handleLogout = () => {
+    sessionStorage.removeItem(AUTH_KEY)
+    setIsAuthenticated(false)
+  }
+
   if (!isAuthenticated) {
     return <LoginSSO onSuccess={handleLogin} />
   }
-  return <ShellSideNav />
+  return <ShellSideNav onLogout={handleLogout} />
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(

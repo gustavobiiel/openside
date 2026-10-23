@@ -112,6 +112,90 @@ nav.astryx-top-nav > div:first-child {
   margin-inline-end: 8px;
 }
 
+/*
+ * Celular: a barra guarda a logo, mensagens, avisos, modo claro e o avatar.
+ * A pergunta para a Meire ocupa a faixa de baixo. O menu leva o restante.
+ */
+.fury-shell-top.is-compact {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.fury-shell-top.is-compact nav.astryx-top-nav {
+  min-width: 0;
+  overflow: visible;
+}
+
+.fury-shell-top.is-compact nav.astryx-top-nav > div:first-child,
+.fury-shell-top.is-compact .fury-header-cluster,
+.fury-shell-top.is-compact .fury-profile {
+  flex-shrink: 0;
+}
+
+.fury-shell-top.is-compact .fury-header-cluster {
+  gap: 0;
+  margin-inline-end: 2px;
+}
+
+.fury-shell-top.is-compact .fury-header-cluster > [role='separator'] {
+  display: none;
+}
+
+.fury-mobile-search {
+  min-width: 0;
+  padding: 0 12px 10px;
+}
+
+.fury-header-chat.is-docked {
+  position: relative;
+  top: auto;
+  bottom: auto;
+  left: auto;
+  width: 100%;
+  max-height: none;
+  overflow: visible;
+  z-index: auto;
+}
+
+@media (width < 768px) {
+  .astryx-app-shell,
+  .astryx-layout,
+  #astryx-app-shell-main {
+    min-width: 0;
+  }
+
+  .fury-header-popover {
+    max-height: min(60dvh, 480px);
+  }
+
+  .fury-header-popover-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  /*
+   * O popover ancorado só cresce para a esquerda do ícone. No celular isso
+   * deixa a lista estreita. A faixa usa a largura da tela, logo abaixo da busca.
+   */
+  [popover]:has(.fury-header-popover) {
+    position-area: unset !important;
+    position-try-fallbacks: none !important;
+    inset: 124px 12px auto 12px !important;
+    width: auto !important;
+    max-width: none !important;
+    max-inline-size: none !important;
+    margin: 0 !important;
+  }
+
+  [popover]:has(.fury-header-popover) > div,
+  [popover]:has(.fury-header-popover) .fury-header-popover {
+    width: 100%;
+    max-width: none;
+  }
+}
+
 /* Servidores, docas e SLA ficam à esquerda da divisória do perfil. */
 .fury-ops-header {
   margin-inline-end: 12px;
@@ -232,8 +316,8 @@ nav.astryx-top-nav > div:first-child {
  * dessas faixas voltam para `light`, já que são claros como o conteúdo.
  */
 :root {
-  /* Vermelho da marca, um tom mais fechado para não cansar em áreas grandes. */
-  --fury-red: #c8102e;
+  /* Mesmo vermelho do manifesto no SSO: rgb(255, 0, 50). */
+  --fury-red: #ff0032;
 }
 
 :root[data-theme='light'] .astryx-app-shell,
@@ -363,7 +447,7 @@ nav.astryx-top-nav > div:first-child {
 
 /* O botão pulsa e solta um anel que acompanha o início da onda. */
 .fury-mode-toggle button {
-  --fury-pulse-color: rgba(200, 16, 46, 0.55);
+  --fury-pulse-color: rgba(255, 0, 50, 0.55);
 }
 
 :root[data-theme='light'] .fury-mode-toggle button {
@@ -395,9 +479,8 @@ nav.astryx-top-nav > div:first-child {
 }
 
 /*
- * Carregamento aprovado: o mesmo círculo do botão de modo, em verde, nascendo
- * no card de assinatura e crescendo até cobrir o cabeçalho e o conteúdo da
- * tela. A posição vem do clique, em Coleta e Expedição.
+ * Coleta e expedição: o formulário ocupa a altura da tela e cada etapa do
+ * carrossel entra pela direita. Voltar traz a etapa anterior pela esquerda.
  */
 .coleta-stage {
   position: relative;
@@ -405,519 +488,3709 @@ nav.astryx-top-nav > div:first-child {
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
 
+.coleta-fase {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  transform: translateX(calc(var(--coleta-fase, 0) * -100%));
+  transition: transform 420ms cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+.coleta-fase-page {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+.coleta-fase-page > .astryx-layout,
 .coleta-stage > .astryx-layout {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+}
+
+.coleta-carousel {
+  overflow: hidden;
+  min-width: 0;
+}
+
+.coleta-track {
+  display: flex;
+  width: 100%;
+  transform: translateX(calc(var(--coleta-step, 0) * -100%));
+  transition: transform 420ms cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+.coleta-page {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.coleta-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coleta-track,
+  .coleta-fase,
+  .uber-field-label,
+  .uber-map-stage,
+  .uber-float,
+  .uber-agendadas-trilho {
+    transition: none;
+  }
+
+  .uber-float {
+    animation: none;
+  }
+
+  .uber-placa-sai,
+  .uber-placa-entra,
+  .americanas-card.is-on,
+  .uber-consolidador-digito,
+  .coleta-bip {
+    animation: none;
+  }
+
+  .coleta-bip {
+    opacity: 0;
+  }
+
+  .mapa-sai,
+  .mapa-sai.is-saindo {
+    transition: none;
+  }
+
+  .americanas-card.is-on {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/*
+ * Tela geral, antes da coleta. O desenho segue a página de viagem da Uber
+ * e fica só na área da coleta: topo, painel e mapa.
+ */
+.uber-home {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #fff;
+  color: #000;
+  font-family: var(--font-family-body);
+}
+
+.uber-home button,
+.uber-home input,
+.uber-home textarea {
+  font-family: inherit;
+}
+
+.uber-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 64px;
+  padding: 0 12px 0 8px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* No escuro, toda a coleta segue a barra do Fury, como o carregamento. */
+:root[data-theme='dark'] .uber-home {
+  background: #1b1b1b;
+  color: #fff;
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] .uber-home .uber-top,
+:root[data-theme='dark'] .uber-home ._css-litYGX {
+  background: #1b1b1b;
+  color: #fff;
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] .uber-home .uber-top {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-logo,
+  .uber-voltar,
+  .uber-tab,
+  .uber-activity,
+  .uber-profile
+) {
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-tab.is-active {
+  background: #fff;
+  color: #1b1b1b;
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-voltar:hover,
+  .uber-tab:not(.is-active):hover,
+  .uber-logo:hover,
+  .uber-activity:hover,
+  .uber-profile:hover
+) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .uber-home .uber-avatar {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home :is(._css-litYGX, .detalhes-body) :is(
+  ._css-eqMetn,
+  ._css-gKpboi,
+  ._css-bRnvUu,
+  ._css-cPcZJQ,
+  ._css-gLFUf,
+  ._css-dwNlsP,
+  ._css-iqRPel
+) {
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home :is(._css-litYGX, .detalhes-body) :is(
+  ._css-dwNlsP,
+  ._css-iqRPel,
+  .uber-loja-card
+) {
+  background-color: #242424;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme='dark'] .uber-home :is(._css-litYGX, .detalhes-body) :is(
+  ._css-iKcfTw,
+  ._css-eSXOyD,
+  ._css-fbBTWH,
+  ._css-iLgNUW,
+  ._css-kAcSwP
+) {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme='dark'] .uber-home ._css-gLFUf:hover,
+:root[data-theme='dark'] .uber-home ._css-gLFUf:focus {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-carga-progresso,
+  .uber-consolidador,
+  .uber-consolidador-acoes,
+  .uber-consolidador-alerta,
+  .uber-consolidador-rotulo,
+  .uber-consolidador-digito
+) {
+  color: #fff;
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] .uber-home .uber-consolidador-caixa {
+  background: #242424;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+:root[data-theme='dark'] .uber-home .uber-consolidador-caixa.is-filled {
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+:root[data-theme='dark'] .uber-home .uber-consolidador-caixa:focus-within {
+  border-color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-consolidador-campo {
+  caret-color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-agendada-ponto {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+:root[data-theme='dark'] .uber-home .uber-agendada-ponto.is-atual {
+  background: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-agendada-unidade span,
+:root[data-theme='dark'] .uber-home .uber-veiculo-dados span {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+:root[data-theme='dark'] .uber-home .uber-veiculo-dados,
+:root[data-theme='dark'] .uber-home .uber-lateral-card {
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-lateral-card {
+  background: #242424;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme='dark'] .uber-home .uber-lateral-card p,
+:root[data-theme='dark'] .uber-home .uber-lojas span {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+:root[data-theme='dark'] .uber-home .uber-foto {
+  background: #1b1b1b;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+:root[data-theme='dark'] .uber-home .uber-foto span {
+  background: rgba(27, 27, 27, 0.82);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-assinatura {
+  background: #1b1b1b;
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-assinatura-acoes button {
+  background: #fff;
+  color: #1b1b1b;
+}
+
+:root[data-theme='dark'] .uber-home .uber-assinatura-acoes button:first-child {
+  background: transparent;
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+:root[data-theme='dark'] .uber-home .uber-loja-card {
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-cons-arte,
+:root[data-theme='dark'] .uber-home .uber-loja-nota,
+:root[data-theme='dark'] .uber-home .uber-cons-linha,
+:root[data-theme='dark'] .uber-home .uber-cons-itens {
+  background: #1b1b1b;
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-loja-corpo > p {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+:root[data-theme='dark'] .uber-home .uber-cons-linha.is-atrasado,
+:root[data-theme='dark'] .uber-home .uber-cons-linha.is-atrasado em {
+  color: #f87171;
+}
+
+:root[data-theme='dark'] .uber-home .uber-cons-linha.is-aguardando,
+:root[data-theme='dark'] .uber-home .uber-cons-linha.is-aguardando em {
+  color: #fb923c;
+}
+
+:root[data-theme='dark'] .uber-home .uber-cons-card.is-atrasado ._css-eSXOyD {
+  color: #f87171;
+}
+
+:root[data-theme='dark'] .uber-home .uber-cons-card.is-aguardando ._css-eSXOyD {
+  color: #fb923c;
+}
+
+:root[data-theme='dark'] .uber-home .uber-cons-card.is-bipado ._css-eSXOyD {
+  color: #4ade80;
+}
+
+:root[data-theme='dark'] .uber-home .uber-cons-linha.is-bipado em {
+  color: #4ade80;
+}
+
+:root[data-theme='dark'] .uber-home .uber-carga-progresso.is-batido span {
+  color: #f87171 !important;
+}
+
+:root[data-theme='dark'] .uber-home .uber-float {
+  background: #1b1b1b;
+  color: #fff;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .uber-home .uber-float-grip {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+:root[data-theme='dark'] .uber-home .uber-float-nav {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .uber-home .uber-float-option {
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-float-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .uber-home .uber-float-option.is-active,
+:root[data-theme='dark'] .uber-home .uber-float-option.is-active:hover {
+  background: #fff;
+  color: #1b1b1b;
+}
+
+:root[data-theme='dark'] .uber-home .uber-ajuda {
+  background: #1b1b1b;
+  color: #fff;
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] .uber-home .uber-ajuda :is(h2, p, span, strong, li, button) {
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-ajuda-sub,
+:root[data-theme='dark'] .uber-home .uber-ajuda-topicos button {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme='dark'] .uber-home .uber-ajuda-area.is-active,
+:root[data-theme='dark'] .uber-home .uber-ajuda-area.is-active span {
+  background: #fff;
+  color: #1b1b1b;
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-ajuda-busca:hover,
+  .uber-ajuda-head button,
+  .uber-ajuda-recibo,
+  .uber-ajuda-avatar
+) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-ajuda-head button:hover,
+  .uber-ajuda-recibo:hover,
+  .uber-ajuda-topicos button:hover
+) {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+:root[data-theme='dark'] .uber-home .uber-ajuda-viagem {
+  background: #242424;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme='dark'] .uber-home .uber-ajuda-estrelas {
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-activity.is-current {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home :is(.uber-sheet, .envios-sheet, .envios-bar, .detalhes-body) {
+  background: #1b1b1b;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-form h1,
+  .uber-sheet,
+  .envios-sheet h1,
+  .envios-sheet h2,
+  .envios-sheet strong,
+  .envios-total,
+  .envios-pagamento,
+  .conferencia-dados dd,
+  .conferencia-secao,
+  .conferencia-campo,
+  .detalhes-body h2,
+  .detalhes-body h3,
+  .detalhes-body p,
+  .detalhes-body button,
+  .uber-embarque,
+  .uber-embarque p,
+  .uber-embarque button,
+  .uber-option
+) {
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-field-label,
+  .conferencia-nota,
+  .conferencia-lojas,
+  .conferencia-dados dt,
+  .uber-embarque button span,
+  .uber-embarque button em
+) {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-pudo,
+  .uber-option,
+  .uber-embarque,
+  .uber-embarque button,
+  .conferencia-campo input,
+  .conferencia-campo select,
+  .conferencia-campo textarea,
+  .conferencia-escolha button,
+  .detalhes-select,
+  .detalhes-menu,
+  .detalhes-vazia-arte,
+  .uber-add
+) {
+  background: #242424;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-stop + .uber-stop,
+  .detalhes-side,
+  .envios-bar,
+  .detalhes-menu
+) {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-add:hover,
+  .uber-option:hover,
+  .uber-embarque button:hover,
+  .uber-embarque button:focus-visible,
+  .conferencia-escolha button:hover,
+  .detalhes-side-item.is-on,
+  .detalhes-side-item:hover,
+  .detalhes-menu button:hover,
+  .detalhes-menu button[aria-selected='true']
+) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home :is(
+  .uber-search,
+  .conferencia-escolha button.is-on,
+  .uber-embarque button.is-sugerido
+) {
+  background: #fff;
+  color: #1b1b1b;
+  border-color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-search:hover {
+  background: #e8e8e8;
+  color: #1b1b1b;
+}
+
+:root[data-theme='dark'] .uber-home .uber-placa-opcao {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-placa-opcao.is-ativa {
+  background: #fff;
+  color: #1b1b1b;
+}
+
+:root[data-theme='dark'] .uber-home .uber-embarque button.is-sugerido em {
+  color: #1b1b1b;
+}
+
+:root[data-theme='dark'] .uber-home :is(.uber-field input, .uber-placa-sai, .uber-placa-entra, .uber-field-icon) {
+  color: #fff;
+  caret-color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-field.is-reel input {
+  color: transparent;
+  caret-color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-zoom {
+  background: #1b1b1b;
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-zoom button:not(:disabled) {
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-home .uber-zoom button + button {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme='dark'] .uber-home .uber-zoom button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .uber-home .envios-marker {
+  background: #242424;
+  color: #fff;
+}
+
+.uber-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.uber-logo,
+.uber-voltar,
+.uber-tab,
+.uber-activity,
+.uber-profile,
+.uber-add,
+.uber-option,
+.uber-search,
+.uber-zoom button {
+  border: 0;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+}
+
+.uber-logo {
+  padding: 8px 16px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  line-height: 1;
+}
+
+.uber-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 40px;
+  padding: 0 12px 0 8px;
+  border-radius: 999px;
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.uber-voltar:hover {
+  background: #f3f3f3;
+}
+
+.uber-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.uber-tab.is-active {
+  background: #000;
+  color: #fff;
+}
+
+.uber-tab:not(.is-active):hover,
+.uber-logo:hover,
+.uber-activity:hover {
+  background: #f3f3f3;
+}
+
+.uber-tab:not(.is-active):hover {
+  border-radius: 999px;
+}
+
+.uber-logo:hover,
+.uber-activity:hover {
+  border-radius: 8px;
+}
+
+.uber-top-end {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.uber-activity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 64px;
+  padding: 6px 8px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.uber-activity-art {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+}
+
+.uber-activity-art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.uber-activity.is-current {
+  border-radius: 8px;
+  background: #f3f3f3;
+}
+
+.uber-profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+}
+
+.uber-profile:hover {
+  background: #f3f3f3;
+}
+
+.uber-avatar {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eee;
+  color: #000;
+}
+
+.uber-avatar svg {
+  width: 22px;
+  height: 22px;
+}
+
+.uber-split {
+  display: flex;
   flex: 1;
   min-height: 0;
 }
 
-.coleta-glow {
-  position: absolute;
-  inset: 0;
-  z-index: 30;
-  pointer-events: none;
-  animation-duration: var(--coleta-ms, 760ms);
-  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-  animation-fill-mode: both;
+.uber-split.is-off {
+  display: none;
 }
 
-.coleta-glow.is-green {
-  background: radial-gradient(
-    circle at var(--coleta-x) var(--coleta-y),
-    rgba(134, 239, 172, 0.72),
-    rgba(22, 163, 74, 0.38) 46%,
-    rgba(21, 128, 61, 0.16)
-  );
-  animation-name: coleta-glow;
-}
-
-.coleta-glow.is-red {
-  background: radial-gradient(
-    circle at var(--coleta-x) var(--coleta-y),
-    rgba(252, 165, 165, 0.78),
-    rgba(220, 38, 38, 0.42) 46%,
-    rgba(153, 27, 27, 0.16)
-  );
-  animation-name: coleta-blink;
-}
-
-.coleta-glow.is-orange {
-  background: radial-gradient(
-    circle at var(--coleta-x) var(--coleta-y),
-    rgba(253, 186, 116, 0.84),
-    rgba(234, 88, 12, 0.46) 46%,
-    rgba(154, 52, 18, 0.16)
-  );
-  animation-name: coleta-blink;
-}
-
-.coleta-glow.is-blue {
-  background: radial-gradient(
-    circle at var(--coleta-x) var(--coleta-y),
-    rgba(147, 197, 253, 0.78),
-    rgba(37, 99, 235, 0.4) 46%,
-    rgba(30, 64, 175, 0.14)
-  );
-  animation-name: coleta-blink;
-}
-
-@keyframes coleta-glow {
-  0% {
-    clip-path: circle(0px at var(--coleta-x) var(--coleta-y));
-    opacity: 1;
-  }
-  72% {
-    opacity: 0.92;
-  }
-  100% {
-    clip-path: circle(var(--coleta-r) at var(--coleta-x) var(--coleta-y));
-    opacity: 0;
-  }
-}
-
-@keyframes coleta-blink {
-  0% {
-    clip-path: circle(0px at var(--coleta-x) var(--coleta-y));
-    opacity: 0;
-  }
-  16% {
-    opacity: 1;
-  }
-  38% {
-    opacity: 0.2;
-  }
-  62% {
-    opacity: 0.95;
-  }
-  100% {
-    clip-path: circle(var(--coleta-r) at var(--coleta-x) var(--coleta-y));
-    opacity: 0;
-  }
-}
-
-.coleta-pulse {
-  position: relative;
-  z-index: 31;
-  border-radius: 12px;
-  animation: coleta-confirm-pulse var(--coleta-ms, 760ms)
-    cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.coleta-pulse.is-green {
-  --coleta-pulse: rgba(74, 222, 128, 0.7);
-}
-
-.coleta-pulse.is-red {
-  --coleta-pulse: rgba(248, 113, 113, 0.75);
-}
-
-.coleta-pulse.is-orange {
-  --coleta-pulse: rgba(251, 146, 60, 0.8);
-}
-
-.coleta-pulse.is-blue {
-  --coleta-pulse: rgba(96, 165, 250, 0.75);
-}
-
-@keyframes coleta-confirm-pulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 var(--coleta-pulse, rgba(74, 222, 128, 0.7));
-  }
-  35% {
-    transform: scale(1.025);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 28px transparent;
-  }
-}
-
-/* Caminhão no topo da leitura: fundo transparente e um ponto discreto atrás. */
-/*
- * Título e caminhão dividem a mesma célula do grid: o título fica no canto e o
- * caminhão no centro, sem empurrar nada. A altura é fixa para o hero não mudar
- * de tamanho com a largura da tela.
- */
-.coleta-leitura-hero {
-  position: relative;
-  display: grid;
-  grid-template-areas: 'hero';
-  height: 236px;
-  padding: 0 4px;
-  overflow: hidden;
-}
-
-.coleta-leitura-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 6px;
-  background-image: radial-gradient(
-    circle at 1px 1px,
-    color-mix(in srgb, currentColor 18%, transparent) 1px,
-    transparent 0
-  );
-  background-size: 14px 14px;
-  mask-image: radial-gradient(
-    ellipse 52% 70% at 50% 62%,
-    #000 30%,
-    transparent 100%
-  );
-  pointer-events: none;
-}
-
-.coleta-leitura-hero::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: min(460px, 90%);
-  height: 72px;
-  transform: translateX(-50%);
-  background: radial-gradient(
-    ellipse at center,
-    color-mix(in srgb, currentColor 10%, transparent),
-    transparent 70%
-  );
-  pointer-events: none;
-}
-
-.coleta-leitura-hero > h2 {
-  position: relative;
-  z-index: 2;
-  grid-area: hero;
-  align-self: start;
-  justify-self: start;
-}
-
-/* A foto é quase quadrada; o aspect-ratio estica um pouco para o caminhão ficar mais largo. */
-.coleta-leitura-truck {
-  position: relative;
-  z-index: 1;
-  grid-area: hero;
-  align-self: end;
-  justify-self: center;
-  width: min(360px, 68%);
-  aspect-ratio: 1.55;
-  height: auto;
-  max-height: 100%;
-  object-fit: fill;
-  filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.42));
-  pointer-events: none;
-  user-select: none;
-}
-
-@media (max-width: 720px) {
-  .coleta-leitura-hero {
-    grid-template-areas:
-      'title'
-      'hero';
-    grid-template-rows: auto minmax(0, 1fr);
-    height: 232px;
-  }
-
-  .coleta-leitura-hero > h2 {
-    grid-area: title;
-  }
-
-  .coleta-leitura-truck {
-    width: min(300px, 86%);
-  }
-}
-
-/* Peso atual no painel de detalhes: soma das etiquetas já bipadas. */
-.coleta-peso {
+.uber-sheet {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  width: 440px;
+  flex-shrink: 0;
+  min-height: 0;
+  background: #fff;
+  border-right: 1px solid #eee;
 }
 
-.coleta-peso-valor {
-  font-size: 24px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+.uber-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 28px 16px 16px;
+  overflow-y: auto;
+}
+
+.uber-form h1 {
+  margin: 0 8px 20px;
+  color: #000;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1.2px;
   line-height: 1.1;
 }
 
-/* Ordem das lojas: fundo é quem chega antes, porta é quem chega por último. */
-.coleta-lojas {
+.uber-pudo {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.coleta-lojas-trilho {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.coleta-loja {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  margin: 0;
+  padding: 4px;
+  list-style: none;
   border-radius: 12px;
-  background: color-mix(in srgb, currentColor 4%, transparent);
+  background: #f3f3f3;
 }
 
-.coleta-loja.is-active {
-  border-color: color-mix(in srgb, #4ade80 65%, transparent);
+.uber-pudo.is-erro {
+  box-shadow: inset 0 0 0 2px #d6001c;
 }
 
-.coleta-loja-codigos {
+.uber-erro {
+  margin: 10px 8px 0;
+  color: #d6001c;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.uber-stop {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px 10px;
-  color: color-mix(in srgb, currentColor 62%, transparent);
+  align-items: center;
+  gap: 8px;
+}
+
+.uber-stop + .uber-stop {
+  border-top: 1px solid #e6e6e6;
+}
+
+.uber-field.is-reel .uber-field-label {
+  top: 8px;
   font-size: 12px;
-  font-variant-numeric: tabular-nums;
 }
 
-.coleta-loja-codigos .is-done {
-  color: #4ade80;
+.uber-field.is-reel input {
+  color: transparent;
+  caret-color: #000;
 }
 
-.coleta-loja-codigos .is-pending {
-  color: #86efac;
-}
-
-@media (max-width: 720px) {
-  .coleta-lojas-trilho {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* Card hero das fotos do DCP, no painel lateral. */
-.coleta-dcp-hero {
-  position: relative;
-  overflow: hidden;
-  border-radius: inherit;
-}
-
-.coleta-dcp-hero .coleta-foto {
-  border-radius: 0;
-}
-
-/* O texto da capa ocupa a base; o ícone sobe para não ficar embaixo dele. */
-.coleta-dcp-hero .coleta-foto-placeholder {
-  padding-bottom: 56px;
-}
-
-.coleta-dcp-hero-copy {
+.uber-placa-reel {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 32px 12px 10px;
-  color: #fff;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.78), transparent);
+  top: 22px;
+  right: 8px;
+  left: 8px;
+  height: 22px;
+  overflow: hidden;
   pointer-events: none;
 }
 
-.coleta-dcp-hero-copy strong {
-  font-size: 14px;
-  font-weight: 600;
+.uber-placa-sai,
+.uber-placa-entra {
+  position: absolute;
+  left: 0;
+  color: #000;
+  font-size: 16px;
+  line-height: 22px;
 }
 
-.coleta-dcp-hero-copy span {
+.uber-placa-sai {
+  animation: uber-placa-sai 560ms cubic-bezier(0.22, 0.8, 0.24, 1) forwards;
+}
+
+.uber-placa-entra {
+  animation: uber-placa-entra 560ms cubic-bezier(0.22, 0.8, 0.24, 1) forwards;
+}
+
+@keyframes uber-placa-sai {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(22px);
+    opacity: 0;
+  }
+}
+
+@keyframes uber-placa-entra {
+  from {
+    transform: translateY(22px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.uber-field {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  min-height: 56px;
+}
+
+.uber-field-icon {
+  display: grid;
+  width: 40px;
+  flex-shrink: 0;
+  place-items: center;
+  color: #000;
+}
+
+.uber-field-body {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.uber-field input {
+  width: 100%;
+  height: 56px;
+  margin: 0;
+  padding: 20px 8px 4px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #000;
+  font-size: 16px;
+  box-shadow: none;
+}
+
+.uber-field-label {
+  position: absolute;
+  top: 18px;
+  left: 8px;
+  color: #4b4b4b;
+  font-size: 16px;
+  line-height: 1.2;
+  pointer-events: none;
+  transition: top 160ms ease, font-size 160ms ease;
+}
+
+.uber-field input:focus + .uber-field-label,
+.uber-field input:not(:placeholder-shown) + .uber-field-label {
+  top: 8px;
   font-size: 12px;
-  opacity: 0.88;
+}
+
+.uber-add {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  margin-right: 4px;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+}
+
+.uber-add:hover {
+  background: #f6f6f6;
+}
+
+.uber-options {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.uber-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 10px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.uber-option:hover {
+  background: #fafafa;
+}
+
+.uber-option span {
+  flex: 1;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.uber-embarque {
+  margin-top: 8px;
+  padding: 8px;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  background: #fff;
+  color: #000;
+}
+
+.uber-embarque p {
+  margin: 4px 8px 8px;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.uber-embarque ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.uber-embarque li + li {
+  margin-top: 6px;
+}
+
+.uber-embarque button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  background: #fff;
+  color: #000;
+  text-align: left;
+  cursor: pointer;
+}
+
+.uber-embarque-corpo {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.uber-embarque button > svg {
+  flex-shrink: 0;
+  transform: rotate(-90deg);
+}
+
+.uber-embarque button strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.uber-embarque button span,
+.uber-embarque button em {
+  color: #4b4b4b;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.uber-embarque button.is-sugerido {
+  border-color: #000;
+  background: #f3f3f3;
+}
+
+.uber-embarque button.is-sugerido em {
+  color: #000;
+  font-weight: 500;
+}
+
+.uber-embarque button:hover,
+.uber-embarque button:focus-visible {
+  border-color: #000;
+  background: #f7f7f7;
+}
+
+.uber-embarque button:active {
+  background: #e8e8e8;
+}
+
+.uber-sheet-fill {
+  flex: 1;
 }
 
 /*
- * Foto do DCP com os estados do Thumbnail: skeleton, placeholder, envio e
- * carregada. A proporção vem do AspectRatio; a foto só preenche a caixa.
+ * Painel flutuante da tela de carregamento. Fica centrado embaixo,
+ * por cima da lista, no mesmo cartão solto da Uber.
  */
-.coleta-foto {
+.uber-float-stage {
   position: relative;
-  width: 100%;
-  height: 100%;
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.uber-float-stage > ._css-litYGX {
+  padding-bottom: 168px;
+}
+
+.uber-agendadas {
+  position: relative;
+}
+
+.uber-agendadas-viewport {
+  position: relative;
   overflow: hidden;
-  border-radius: var(--radius-element);
+  touch-action: pan-y;
+  container-type: inline-size;
 }
 
-/* Fundo só no placeholder: atrás do Skeleton ele apagaria o pulso de opacidade. */
-.coleta-foto.is-placeholder {
-  background-color: var(--color-neutral);
+.uber-agendadas-trilho {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  transition: transform 420ms cubic-bezier(0.22, 0.8, 0.24, 1);
 }
 
-.coleta-foto > img {
+.uber-agendadas-trilho.is-instantaneo {
+  transition: none;
+}
+
+.uber-agendada {
+  flex: 0 0 calc((100cqi - 24px) / 3);
+  width: calc((100cqi - 24px) / 3);
+  min-width: 0;
+  min-height: 242px;
+  cursor: default;
+}
+
+.uber-agendada-corpo {
+  min-height: 110px;
+}
+
+.uber-agendada-seta {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.uber-agendada-seta:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.uber-agendada-seta.is-anterior {
+  left: 12px;
+}
+
+.uber-agendada-seta.is-proxima {
+  right: 12px;
+}
+
+.uber-agendada-pontos {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.uber-agendada-ponto {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+}
+
+.uber-agendada-ponto.is-atual {
+  width: 16px;
+  background: #000;
+}
+
+.uber-agendada-timer {
+  color: inherit;
+}
+
+.uber-agendada-timer time {
+  font-variant-numeric: tabular-nums;
+}
+
+.uber-agendada-corpo.is-unidades {
+  display: flex;
+  padding: 16px;
+}
+
+.uber-agendada-unidades {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.uber-agendada-unidade {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.uber-agendada-unidade.is-falta {
+  align-items: flex-end;
+  text-align: end;
+}
+
+.uber-agendada-unidade strong {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 32px;
+  font-variant-numeric: tabular-nums;
+}
+
+.uber-agendada-unidade.is-hora strong {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+.uber-agendada-unidade span {
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.uber-veiculo-dados {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin: 0;
+  padding: 4px 8px 0 0;
+  list-style: none;
+  color: #111;
+}
+
+.uber-veiculo-dados li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.uber-veiculo-dados svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.uber-veiculo-dados span {
+  display: block;
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 13px;
+  line-height: 16px;
+}
+
+.uber-veiculo-dados strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.uber-home ._css-dvLxxC {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.uber-lateral-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  background: #fff;
+  color: #111;
+}
+
+.uber-lateral-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.uber-lateral-card p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.uber-lojas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.uber-lojas li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.uber-lojas svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.uber-lojas strong {
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.uber-lojas span {
+  display: block;
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.uber-fotos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.uber-foto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-height: 108px;
+  margin: 0;
+  padding: 8px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #f3f3f3;
+  color: rgba(0, 0, 0, 0.72);
+  cursor: pointer;
+}
+
+.uber-foto input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.uber-foto img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 200ms ease;
 }
 
-.coleta-foto-camada {
-  position: absolute;
-  inset: 0;
-}
-
-.coleta-foto-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-icon-secondary);
-}
-
-.coleta-foto-envio {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-overlay, rgba(0, 0, 0, 0.45));
-}
-
-/* Galeria das fotos: mesmo desenho do mixed-gallery, com a primeira foto em destaque. */
-.coleta-fotos {
-  container: coleta-fotos / inline-size;
-}
-
-.coleta-fotos-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.coleta-fotos-grid > figure {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-  margin: 0;
-}
-
-.coleta-fotos-grid > .is-hero {
-  grid-column: span 2;
-}
-
-@container coleta-fotos (max-width: 720px) {
-  .coleta-fotos-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .coleta-fotos-grid > .is-hero {
-    grid-column: 1 / -1;
-  }
-
-  /* Sobrescreve o 3:1 do AspectRatio para os quadros empilhados ficarem iguais. */
-  .coleta-fotos-grid > .is-hero .coleta-foto-ratio {
-    aspect-ratio: 3 / 2;
-  }
-}
-
-/* Código da etiqueta: cada algarismo entra da esquerda para a direita. */
-.coleta-scan-field {
+.uber-foto span {
   position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 52px;
-  padding: 0 14px;
-  overflow: hidden;
-  color: inherit;
-  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
-  border-radius: 10px;
-  background: color-mix(in srgb, currentColor 6%, transparent);
-  font-size: 22px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.16em;
+  z-index: 1;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #111;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  text-align: center;
 }
 
-.coleta-scan-capture {
+.uber-foto svg {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  margin: 0;
-  border: 0;
-  opacity: 0;
-  cursor: text;
+  top: 28px;
 }
 
-.coleta-scan-capture:disabled {
+.uber-assinatura {
+  width: 100%;
+  height: 96px;
+  border: 0;
+  border-radius: 12px;
+  background: #f6f6f6;
+  color: #111;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.uber-assinatura-acoes {
+  display: flex;
+  gap: 8px;
+}
+
+.uber-assinatura-acoes button {
+  flex: 1;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.uber-assinatura-acoes button:first-child {
+  background: transparent;
+  color: #111;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.16);
+}
+
+.uber-assinatura-acoes button:disabled {
+  opacity: 0.4;
   cursor: default;
 }
 
-.coleta-code-ghost {
-  color: color-mix(in srgb, currentColor 42%, transparent);
-  letter-spacing: 0.04em;
-  font-size: 15px;
+.uber-assinatura-ok {
+  font-size: 13px;
+  line-height: 18px;
 }
 
-.coleta-code-digit {
-  display: inline-block;
-  animation: coleta-digit-in 460ms cubic-bezier(0.16, 0.84, 0.24, 1) both;
+.uber-finalizar {
+  height: 36px;
+  margin-right: 8px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.coleta-scan-field > span {
-  display: inline-flex;
-  align-items: center;
-  min-width: 0;
+:root[data-theme='dark'] .uber-home .uber-finalizar {
+  background: #fff;
+  color: #1b1b1b;
 }
 
-.coleta-code-caret {
-  display: inline-block;
-  width: 2px;
-  height: 1.05em;
-  margin-left: 3px;
-  background: currentColor;
-  animation: coleta-caret 1s steps(1) infinite;
+.uber-foto-dcp {
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
 }
 
-@keyframes coleta-digit-in {
-  from {
-    opacity: 0;
-    transform: translateX(-18px);
-    filter: blur(3px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-    filter: blur(0);
-  }
+.uber-foto-dcp-imagem {
+  display: block;
+  height: 132px;
+  width: 100%;
+  background: #111 url('/americanas-caminhao.jpg') center / cover no-repeat;
 }
 
-@keyframes coleta-caret {
-  0%,
-  45% {
-    opacity: 1;
-  }
-  46%,
-  100% {
-    opacity: 0;
-  }
+.uber-velo {
+  position: fixed;
+  inset: 0;
+  z-index: 180;
+  display: grid;
+  place-items: center;
+  padding: 24px;
 }
 
-.coleta-estorno-note {
-  color: #60a5fa;
+.uber-velo-fundo {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(18px);
+  cursor: pointer;
+}
+
+.uber-velo-card {
+  position: relative;
+  z-index: 1;
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 24px;
+  border-radius: 20px;
+  background: #fff;
+  color: #111;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+
+.uber-velo-card h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 28px;
+}
+
+.uber-velo-card p {
+  margin: 8px 0 0;
+  color: rgba(0, 0, 0, 0.62);
   font-size: 14px;
+  line-height: 20px;
+}
+
+.uber-velo-erro {
+  color: #dc2626 !important;
+}
+
+.uber-mural-card {
+  width: min(720px, calc(100vw - 32px));
+}
+
+.uber-mural {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.uber-mural-item.is-alta {
+  grid-row: span 2;
+}
+
+.uber-mural-item {
+  margin: 0;
+}
+
+.uber-mural-item img,
+.uber-mural-vazio {
+  display: block;
+  width: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.uber-mural-item img {
+  aspect-ratio: 1;
+}
+
+.uber-mural-item.is-alta img {
+  aspect-ratio: 3 / 4;
+}
+
+.uber-mural-item figcaption {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.uber-mural-vazio {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  background: #f3f3f3;
+  color: rgba(0, 0, 0, 0.62);
+  cursor: pointer;
+}
+
+.uber-mural-vazio input {
+  display: none;
+}
+
+.uber-senha {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.uber-senha-casa {
+  width: 44px;
+  height: 54px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: #f6f6f6;
+  color: #111;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.uber-assinatura-tela,
+.uber-assinatura-preview,
+.uber-assinatura-sobe {
+  display: block;
+  width: 100%;
+  height: 140px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 12px;
+  background: #f6f6f6;
+  object-fit: contain;
+}
+
+.uber-assinatura-tela {
+  color: #111;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.uber-assinatura-sobe {
+  animation: uber-sobe 0.7s ease;
+}
+
+.uber-velo-acoes {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.uber-velo-acoes button {
+  flex: 1;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.uber-velo-acoes button:first-child {
+  background: transparent;
+  color: #111;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.16);
+}
+
+.uber-fim {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #fff;
+  color-scheme: light;
+  pointer-events: none;
+  animation: uber-fim-some 0.8s ease 2.2s forwards;
+}
+
+.uber-fim-marca {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  animation: uber-verificado 1.05s cubic-bezier(0.16, 1.35, 0.3, 1) both;
+}
+
+.uber-fim-marca::after {
+  content: '';
+  position: absolute;
+  inset: 28px;
+  border: 3px solid rgba(34, 197, 94, 0.9);
+  border-radius: 50%;
+  animation: uber-verificado-anel 0.95s ease-out 0.18s both;
+}
+
+.uber-fim-marca img {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .coleta-glow,
-  .coleta-pulse,
-  .coleta-code-digit,
-  .coleta-code-caret {
+  .uber-fim,
+  .uber-fim-marca,
+  .uber-fim-marca::after,
+  .uber-assinatura-sobe {
     animation: none;
   }
 }
 
-/* Spinner centralizado na área de conteúdo enquanto a tela carrega. */
-.fury-screen-loading {
+@keyframes uber-sobe {
+  from {
+    transform: translateY(72px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes uber-verificado {
+  0% {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+  58% {
+    transform: scale(1.16);
+    opacity: 1;
+  }
+  78% {
+    transform: scale(0.94);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes uber-verificado-anel {
+  0% {
+    transform: scale(0.65);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes uber-fim-some {
+  to {
+    opacity: 0;
+  }
+}
+
+:root[data-theme='dark'] .uber-velo-card {
+  background: #242424;
+  color: #fff;
+}
+
+:root[data-theme='dark'] .uber-velo-card p,
+:root[data-theme='dark'] .uber-mural-item figcaption {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+:root[data-theme='dark'] .uber-senha-casa,
+:root[data-theme='dark'] .uber-assinatura-tela,
+:root[data-theme='dark'] .uber-assinatura-preview,
+:root[data-theme='dark'] .uber-mural-vazio {
+  background: #1b1b1b;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+:root[data-theme='dark'] .uber-velo-acoes button {
+  background: #fff;
+  color: #1b1b1b;
+}
+
+:root[data-theme='dark'] .uber-velo-acoes button:first-child {
+  background: transparent;
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+.uber-carga-progresso {
+  margin-top: 16px;
+  color-scheme: light;
+}
+
+.uber-carga-progresso.is-batido span {
+  color: #dc2626 !important;
+  font-weight: 700;
+}
+
+button.uber-cons-card {
+  font: inherit;
+  appearance: none;
+}
+
+.uber-cons-arte {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 100px;
+  height: 100px;
+  margin: 12px 0 12px 12px;
+  border-radius: 12px;
+  background: #f3f3f3;
+  color: #111;
+}
+
+.uber-cons-meta {
+  display: block;
+}
+
+.uber-cons-card ._css-eSXOyD {
+  gap: 6px;
+  pointer-events: none;
+}
+
+.uber-cons-card.is-atrasado ._css-eSXOyD {
+  color: #dc2626;
+}
+
+.uber-cons-card.is-aguardando ._css-eSXOyD {
+  color: #ea580c;
+}
+
+.uber-cons-card.is-bipado ._css-eSXOyD {
+  color: #16a34a;
+}
+
+.uber-cons-card + .uber-cons-itens {
+  margin-top: 8px;
+}
+
+.uber-loja-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  border: 2px solid rgba(196, 196, 196, 0.45);
+  border-radius: 12px;
+  background: #fff;
+  color: #111;
+}
+
+.uber-loja-nota {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  background: #f3f3f3;
+  color: #111;
+}
+
+.uber-loja-corpo {
+  min-width: 0;
+  flex: 1;
+}
+
+.uber-loja-corpo h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.uber-loja-corpo > p {
+  margin: 2px 0 0;
+  color: rgba(0, 0, 0, 0.62);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.uber-loja-corpo > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.uber-cons-linha {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: #f6f6f6;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.uber-cons-linha span {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.uber-cons-linha strong {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.uber-cons-linha em {
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.uber-cons-linha b {
+  flex: none;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.uber-cons-linha.is-atrasado,
+.uber-cons-linha.is-atrasado em {
+  color: #dc2626;
+}
+
+.uber-cons-linha.is-aguardando,
+.uber-cons-linha.is-aguardando em {
+  color: #ea580c;
+}
+
+.uber-cons-linha.is-bipado em {
+  color: #16a34a;
+}
+
+.uber-cons-itens {
+  margin: 6px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f6f6f6;
+}
+
+.uber-cons-itens p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.uber-cons-itens ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.uber-cons-itens li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.uber-consolidador {
+  margin-top: 16px;
+  color: #000;
+  color-scheme: light;
+}
+
+.uber-consolidador-rotulo {
+  display: block;
+  margin-bottom: 8px;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.uber-consolidador-linha {
+  display: flex;
+  gap: 12px;
+}
+
+.uber-consolidador-grupo {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+}
+
+.uber-consolidador-caixa {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 160ms ease;
+}
+
+.uber-consolidador-caixa.is-filled {
+  border-color: #d5d5d5;
+}
+
+.uber-consolidador-caixa:focus-within {
+  border-color: #000;
+}
+
+.uber-consolidador-campo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: #000;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+}
+
+.uber-consolidador-digito {
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  pointer-events: none;
+  animation: uber-digito-entra 280ms cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+
+@keyframes uber-digito-entra {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.uber-consolidador-acoes {
+  display: flex;
+  align-items: center;
+  margin-top: 14px;
+  color: #000;
+  color-scheme: light;
+}
+
+.uber-consolidador-alerta {
+  margin-top: 12px;
+  color-scheme: light;
+}
+
+/* O pulso cobre só a coleta: o topo e a lista, sem o restante do Fury. */
+.coleta-bip {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background: var(--coleta-bip-cor);
+  animation: coleta-bip 760ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.coleta-bip.is-verde {
+  --coleta-bip-cor: rgba(22, 163, 74, 0.62);
+}
+
+.coleta-bip.is-vermelho {
+  --coleta-bip-cor: rgba(220, 38, 38, 0.62);
+}
+
+.coleta-bip.is-amarelo {
+  --coleta-bip-cor: rgba(234, 179, 8, 0.72);
+}
+
+.coleta-bip.is-azul {
+  --coleta-bip-cor: rgba(37, 99, 235, 0.62);
+}
+
+@keyframes coleta-bip {
+  0% {
+    opacity: 0;
+    box-shadow: inset 0 0 0 0 var(--coleta-bip-cor);
+  }
+
+  35% {
+    opacity: 1;
+    box-shadow: inset 0 0 0 18px var(--coleta-bip-cor);
+  }
+
+  100% {
+    opacity: 0;
+    box-shadow: inset 0 0 0 64px transparent;
+  }
+}
+
+.uber-ajuda {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  background: #fff;
+  color: #000;
+  color-scheme: light;
+}
+
+.uber-ajuda h2,
+.uber-ajuda p,
+.uber-ajuda span,
+.uber-ajuda strong,
+.uber-ajuda li,
+.uber-ajuda button {
+  color: #000;
+}
+
+.uber-ajuda-sub {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px;
+  height: 64px;
+  padding: 0 16px 0 24px;
+  border-bottom: 1px solid #eee;
+}
+
+.uber-ajuda-marca {
+  flex-shrink: 0;
+  margin-right: 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.uber-ajuda-areas {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+}
+
+.uber-ajuda-area {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.uber-ajuda-area.is-active {
+  background: #000;
+  color: #fff;
+}
+
+.uber-ajuda-corpo {
+  width: min(1136px, 100%);
+  margin: 0 auto;
+  padding: 8px 24px 160px;
+}
+
+.uber-ajuda-crumb {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  font-size: 14px;
+}
+
+.uber-ajuda-busca {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+}
+
+.uber-ajuda-busca:hover {
+  background: #f3f3f3;
+}
+
+.uber-ajuda-bloco {
+  margin-top: 8px;
+}
+
+.uber-ajuda-head,
+.uber-ajuda-bloco h2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+}
+
+.uber-ajuda-head button,
+.uber-ajuda-recibo {
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #f3f3f3;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.uber-ajuda-head button:hover,
+.uber-ajuda-recibo:hover,
+.uber-ajuda-topicos button:hover {
+  background: #e8e8e8;
+}
+
+.uber-ajuda-viagem {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid rgba(196, 196, 196, 0.45);
+  border-radius: 12px;
+}
+
+.uber-ajuda-dados {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.uber-ajuda-dados strong {
+  font-size: 18px;
+}
+
+.uber-ajuda-dados p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.uber-ajuda-endereco {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.uber-ajuda-endereco svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.uber-ajuda p.uber-ajuda-valor {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.uber-ajuda-motorista {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.uber-ajuda-avatar {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eee;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.uber-ajuda-estrelas {
+  display: inline-flex;
+  gap: 2px;
+  color: #000;
+}
+
+.uber-ajuda-recibo {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.uber-ajuda-mapa {
+  width: 220px;
+  height: 168px;
+  flex-shrink: 0;
+  align-self: center;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #eee;
+}
+
+.uber-ajuda-topicos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.uber-ajuda-topicos button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 20px 8px;
+  border: 0;
+  border-bottom: 1px solid #eee;
+  background: transparent;
+  color: #000;
+  font-size: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .uber-ajuda-viagem {
+    flex-direction: column;
+  }
+
+  .uber-ajuda-mapa {
+    width: 100%;
+    height: 160px;
+  }
+}
+
+.uber-float {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  width: min(860px, calc(100% - 48px));
+  padding: 8px 12px 12px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.16),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+  transform: translateX(-50%);
+  animation: uber-float-in 320ms cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+.uber-float-grip {
+  align-self: center;
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: #e2e2e2;
+}
+
+.uber-float-nav {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #f3f3f3;
+}
+
+.uber-float-option {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.uber-float-option svg {
+  flex-shrink: 0;
+}
+
+.uber-float-option:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.uber-float-option.is-active {
+  background: #000;
+  color: #fff;
+}
+
+.uber-float-option.is-active:hover {
+  background: #000;
+}
+
+@keyframes uber-float-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.uber-search {
+  height: 56px;
+  border-radius: 8px;
+  background: #000;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.uber-search:hover {
+  background: #333;
+}
+
+.uber-placas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.uber-placa-opcao {
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #f3f3f3;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.35px;
+  cursor: pointer;
+}
+
+.uber-placa-opcao.is-ativa {
+  background: #000;
+  color: #fff;
+}
+
+.uber-map {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  background: #e6e4df;
+}
+
+.uber-map-stage {
+  position: absolute;
+  inset: -8%;
+  transform-origin: center center;
+  transition: transform 220ms ease;
+}
+
+.uber-map-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mapa-sai {
+  position: absolute;
+  inset: 0;
+  transition: opacity 480ms ease, transform 480ms ease;
+}
+
+.mapa-sai.is-saindo {
+  opacity: 0;
+  transform: translateX(-56px);
+  pointer-events: none;
+}
+
+.uber-map:has(.americanas-card.is-on) {
+  background: #f3f3f3;
+}
+
+.americanas-card {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  width: min(488px, calc(100% - 48px));
+  height: min(570px, calc(100% - 48px));
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  color: #000;
+  opacity: 0;
+  transform: translate(-50%, -42%) scale(0.94);
+  pointer-events: none;
+}
+
+.americanas-card.is-on {
+  pointer-events: auto;
+  animation: americanas-pop 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.americanas-card img {
+  width: 100%;
+  height: min(290px, 52%);
+  flex-shrink: 0;
+  object-fit: contain;
+  object-position: bottom;
+  border-radius: 32px 32px 0 0;
+  background: #000;
+}
+
+.americanas-card-texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 0;
+  padding: 0 48px 48px;
+}
+
+.americanas-card h3 {
+  margin: 0;
+  color: #000;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.americanas-card p {
+  margin: 4px 0 0;
+  color: #000;
+  font-size: 16px;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+
+.carregamento-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  margin: 0;
+  border-radius: 8px;
+  background: #000;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+@keyframes americanas-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -42%) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.uber-pin {
+  position: absolute;
+  top: 46%;
+  left: 42%;
+  width: 18px;
+  height: 18px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: #276ef1;
+  box-shadow: 0 0 0 8px rgba(39, 110, 241, 0.18);
+}
+
+.uber-car {
+  position: absolute;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
+}
+
+.uber-car.is-a { top: 22%; left: 58%; transform: rotate(8deg); }
+.uber-car.is-b { top: 38%; left: 30%; transform: rotate(-80deg); }
+.uber-car.is-c { top: 54%; left: 64%; transform: rotate(96deg); }
+.uber-car.is-d { top: 68%; left: 24%; transform: rotate(4deg); }
+.uber-car.is-e { top: 30%; left: 78%; transform: rotate(-12deg); }
+
+.uber-zoom {
+  position: absolute;
+  right: 16px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.uber-zoom button {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+}
+
+.uber-zoom button + button {
+  border-top: 1px solid #eee;
+}
+
+.uber-zoom button:hover:not(:disabled) {
+  background: #f6f6f6;
+}
+
+.uber-zoom button:disabled {
+  color: #c4c4c4;
+  cursor: default;
+}
+
+@media (max-width: 860px) {
+  .uber-split {
+    flex-direction: column;
+  }
+
+  .uber-sheet {
+    width: 100%;
+    flex: 1;
+    border-right: 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .uber-map {
+    min-height: 220px;
+  }
+
+  .uber-form h1 {
+    font-size: 28px;
+  }
+
+  .envios-sheet {
+    width: 100%;
+    flex: 1;
+  }
+}
+
+/*
+ * Consulta de envio, depois da confirmação da viagem e da placa.
+ * O painel esquerdo rola; o total fica preso embaixo.
+ */
+.envios-sheet {
+  display: flex;
+  flex-direction: column;
+  width: 440px;
+  min-height: 0;
+  background: #fff;
+  border-right: 1px solid #eee;
+  color: #000;
+}
+
+.envios-sheet h1,
+.envios-sheet h2,
+.envios-sheet strong {
+  color: #000;
+}
+
+.envios-sheet button {
+  cursor: pointer;
+}
+
+.envios-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 20px 16px 24px;
+}
+
+.conferencia-nota,
+.conferencia-lojas {
+  margin: 0 0 16px;
+  color: #4b4b4b;
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+.conferencia-dados {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+  margin: 0 0 16px;
+}
+
+.conferencia-dados div {
+  min-width: 0;
+}
+
+.conferencia-placas {
+  grid-column: 1 / -1;
+}
+
+.conferencia-dados dt {
+  color: #4b4b4b;
+  font-size: 12px;
+}
+
+.conferencia-dados dd {
+  margin: 2px 0 0;
+  color: #000;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.conferencia-secao {
+  margin: 8px 0 12px;
+  color: #000;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.conferencia-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.conferencia-campo input,
+.conferencia-campo select,
+.conferencia-campo textarea {
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #f3f3f3;
+  color: #000;
+  font: inherit;
+  font-weight: 400;
+}
+
+.conferencia-escolha {
+  display: flex;
+  gap: 8px;
+}
+
+.conferencia-escolha button {
+  flex: 1;
+  height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: #f3f3f3;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.conferencia-escolha button.is-on {
+  background: #000;
+  color: #fff;
+}
+
+.conferencia-erro {
+  margin: 0;
+  color: #d6001c;
+  font-size: 14px;
+}
+
+.envios-titulo {
+  margin: 0 0 16px;
+  color: #000;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.envios-modes {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #f3f3f3;
+}
+
+.envios-modes button {
+  flex: 1;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.envios-modes button.is-on {
+  background: #000;
+  color: #fff;
+}
+
+.envios-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.envios-product img {
+  width: 96px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.envios-product-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.envios-product-nome,
+.envios-product-eta,
+.envios-product-nota {
+  margin: 0;
+}
+
+.envios-product-nome {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.envios-product-eta,
+.envios-product-nota,
+.envios-linha p,
+.envios-check-nota,
+.envios-pergunta,
+.envios-regras p,
+.envios-regras li,
+.envios-termos {
+  color: #4b4b4b;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.envios-check {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 12px 0;
+}
+
+.envios-check-titulo {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.envios-check input {
+  width: 22px;
+  height: 22px;
+  accent-color: #000;
+  flex-shrink: 0;
+}
+
+.envios-bloco {
+  margin-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.envios-bloco-titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.envios-linha {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 0;
+}
+
+.envios-linha strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.envios-linha p,
+.envios-pergunta,
+.envios-regras p,
+.envios-termos {
+  margin: 2px 0 0;
+}
+
+.envios-par {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+
+.envios-input,
+.envios-phone,
+.envios-nota {
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: #f3f3f3;
+  color: #000;
+  font-size: 14px;
+}
+
+.envios-input,
+.envios-phone {
+  height: 48px;
+}
+
+.envios-input {
+  padding: 0 12px;
+}
+
+.envios-phone {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 6px;
+}
+
+.envios-phone input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: #000;
+  font-size: 14px;
+}
+
+.envios-flag,
+.envios-ddi {
+  color: #000;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.envios-pergunta {
+  margin: 4px 0 8px;
+}
+
+.envios-calcada {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  margin-bottom: 12px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.envios-nota {
+  display: block;
+  min-height: 84px;
+  margin: 0 0 12px;
+  padding: 12px;
+  resize: vertical;
+}
+
+.envios-alterar {
+  border: 0;
+  background: transparent;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.envios-regras {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.envios-regras h2,
+.envios-regras-titulo {
+  margin: 0 0 8px;
+  color: #000;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.envios-regras ul {
+  margin: 8px 0 12px;
+  padding-left: 18px;
+}
+
+.envios-bar {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid #eee;
+  background: #fff;
+}
+
+.envios-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.envios-pagamento {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
+  color: #000;
+  font-size: 14px;
+  text-align: left;
+}
+
+.envios-pagamento span:nth-child(2) {
+  flex: 1;
+}
+
+.envios-visa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 24px;
+  border-radius: 4px;
+  background: #1a1f71;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.envios-marker {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 280px;
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  background: #fff;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+}
+
+.envios-marker.is-destino {
+  top: 38%;
+  left: 42%;
+}
+
+.envios-marker.is-origem {
+  top: 58%;
+  left: 8%;
+}
+
+.envios-eta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 28px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.envios-eta small {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/*
+ * Detalhes, no lugar de Atividade. Lista de viagens no mesmo desenho
+ * da página de atividades: lateral, agendadas e anteriores.
+ */
+.detalhes-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  background: #fff;
+  color: #000;
+}
+
+.detalhes-body h2,
+.detalhes-body h3,
+.detalhes-body p,
+.detalhes-body button {
+  color: #000;
+}
+
+.detalhes-side {
+  flex: 0 0 240px;
+  padding: 28px 16px;
+  border-right: 1px solid #eee;
+}
+
+.detalhes-side-item {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.detalhes-side-item.is-on,
+.detalhes-side-item:hover {
+  background: #f3f3f3;
+}
+
+.detalhes-main {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  padding: 28px 40px 48px;
+}
+
+.detalhes-main h2 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+}
+
+.detalhes-vazia {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 720px;
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+}
+
+.detalhes-vazia-arte {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 12px;
+  background: #f3f3f3;
+  color: #000;
+}
+
+.detalhes-vazia p {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.detalhes-reservar,
+.detalhes-acoes button,
+.detalhes-mais {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.detalhes-reservar:hover,
+.detalhes-acoes button:hover,
+.detalhes-mais:hover,
+.detalhes-side-item:hover {
+  opacity: 0.72;
+}
+
+.detalhes-anteriores {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 720px;
+  margin-top: 36px;
+}
+
+.detalhes-filtros {
+  display: flex;
+  gap: 8px;
+}
+
+.detalhes-filtro {
+  position: relative;
+}
+
+.detalhes-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: #f3f3f3;
+  color: #000;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.detalhes-menu {
+  position: absolute;
+  z-index: 2;
+  top: 44px;
+  right: 0;
+  min-width: 180px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+.detalhes-menu button {
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #000;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.detalhes-menu button[aria-selected='true'],
+.detalhes-menu button:hover {
+  background: #f3f3f3;
+}
+
+.detalhes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 720px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detalhes-card {
+  display: block;
+  padding: 0;
+  border-bottom: 1px solid #eee;
+}
+
+.detalhes-card-hit {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 0;
+  border: 0;
+  background: transparent;
+  color: #000;
+  text-align: left;
+  cursor: pointer;
+}
+
+.detalhes-extra {
+  margin: 0 0 16px 88px;
+  padding: 4px 16px 12px;
+  border-radius: 12px;
+  background: #f6f6f6;
+  color: #000;
+}
+
+.detalhes-extra h4 {
+  margin: 12px 0 2px;
+  color: #4b4b4b;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.detalhes-extra p {
+  margin: 0;
+  color: #000;
+  font-size: 14px;
+}
+
+.detalhes-assinatura {
+  display: block;
+  width: 180px;
+  height: 48px;
+}
+
+.detalhes-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #f6f6f6;
+}
+
+.detalhes-card-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.detalhes-card-copy h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.detalhes-card-copy p {
+  display: flex;
+  gap: 12px;
+  margin: 4px 0 0;
+  color: #4b4b4b;
+  font-size: 14px;
+}
+
+.detalhes-acoes {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.detalhes-acoes button {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #f3f3f3;
+}
+
+.detalhes-acoes button.is-forte {
+  background: #000;
+  color: #fff;
+}
+
+.detalhes-mais {
+  height: 44px;
+  margin-top: 8px;
+  padding: 0;
+}
+
+.detalhes-aviso {
+  margin: 8px 0 0;
+  color: #4b4b4b;
+  font-size: 14px;
+}
+
+/* Skeleton da troca de tela. O brilho segue o Skeleton active. */
+.fury-skeleton {
+  --sk: rgba(0, 0, 0, 0.06);
+  --sk-shine: rgba(0, 0, 0, 0.15);
+  --sk-line: rgba(0, 0, 0, 0.08);
   width: 100%;
   height: 100%;
   min-height: 100%;
+  overflow: auto;
+}
+
+:root[data-theme='dark'] .fury-skeleton {
+  --sk: rgba(255, 255, 255, 0.08);
+  --sk-shine: rgba(255, 255, 255, 0.18);
+  --sk-line: rgba(255, 255, 255, 0.08);
+}
+
+.fury-sk {
+  display: block;
+  flex: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--sk) 25%, var(--sk-shine) 37%, var(--sk) 63%);
+  background-size: 400% 100%;
+  animation: fury-skeleton-loading 1.4s ease infinite;
+}
+
+.fury-sk-fill {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+}
+
+.fury-sk-cresce {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+.fury-sk-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100%;
+  padding: 24px;
+}
+
+.fury-sk-pad.is-biblioteca {
+  gap: 20px;
+}
+
+.fury-sk-pilha {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fury-sk-linha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.fury-sk-empurra {
+  flex: 1 1 auto;
+}
+
+.fury-sk-caixa {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--sk-line);
+  border-radius: 12px;
+}
+
+.fury-sk-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+}
+
+.fury-sk-icone {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  background: linear-gradient(90deg, #fff 25%, #f3f3f3 37%, #fff 63%);
+  background-size: 400% 100%;
+  transform: translate(-50%, -50%);
+}
+
+:root[data-theme='dark'] .fury-sk-icone {
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 37%, #2a2a2a 63%);
+  background-size: 400% 100%;
+}
+
+.fury-sk-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+}
+
+.fury-sk-card .fury-sk:last-child {
+  margin-top: 8px;
+}
+
+.fury-sk-patio,
+.fury-sk-grafico {
+  overflow: hidden;
+  border: 1px solid var(--sk-line);
+  border-radius: 12px;
+}
+
+.fury-sk-patio-topo,
+.fury-sk-patio-proxima,
+.fury-sk-grafico-topo {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+}
+
+.fury-sk-patio-proxima {
+  align-items: center;
+  border-block: 1px solid var(--sk-line);
+}
+
+.fury-sk-grafico-topo {
+  align-items: center;
+  padding-bottom: 2px;
+}
+
+.fury-sk-grafico-faixa {
+  display: flex;
+  align-items: stretch;
+}
+
+.fury-sk-grafico-item {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 18px 16px;
+}
+
+.fury-sk-grafico-item + .fury-sk-grafico-item {
+  border-left: 1px solid var(--sk-line);
+}
+
+.fury-sk-tabela-linha {
+  display: grid;
+  gap: 16px;
+  align-items: center;
+  height: 48px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--sk-line);
+}
+
+.fury-sk-tabela-linha:first-child {
+  height: 40px;
+}
+
+.fury-sk-quadro {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.fury-sk-quadro-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 16px 0;
+}
+
+.fury-sk-quadro .fury-sk-linha {
+  padding: 16px;
+}
+
+.fury-sk-coleta {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #fff;
+}
+
+:root[data-theme='dark'] .fury-sk-coleta {
+  background: #1b1b1b;
+}
+
+.fury-sk-coleta-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  height: 64px;
+  padding: 0 12px 0 8px;
+  border-bottom: 1px solid var(--sk-line);
+}
+
+.fury-sk-coleta-corpo {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.fury-sk-coleta-folha {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: none;
+  width: 440px;
+  min-height: 0;
+  padding: 28px 16px 16px;
+  border-right: 1px solid var(--sk-line);
+}
+
+.fury-sk-coleta-mapa {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.fury-sk-zoom {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1;
+}
+
+.fury-sk-meire {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 24px;
+}
+
+.fury-sk-meire-miolo {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  width: 100%;
+  max-width: 720px;
+}
+
+.fury-sk-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 148px;
+  padding: 16px;
+  border: 1px solid var(--sk-line);
+  border-radius: 16px;
+}
+
+.fury-sk-conversa {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.fury-sk-conversa-titulo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 24px 0;
+}
+
+.fury-sk-conversa-lista {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 0;
+  padding: 24px;
+}
+
+.fury-sk-bolha {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.fury-sk-bolha.is-minha {
+  justify-content: flex-end;
+}
+
+.fury-sk-conversa-campo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px 20px;
+}
+
+.fury-sk-ajustes {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+}
+
+.fury-sk-ajustes-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: none;
+  width: 280px;
+  padding: 20px 16px;
+  border-right: 1px solid var(--sk-line);
+}
+
+.fury-sk-ajustes-corpo {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 24px;
+}
+
+@keyframes fury-skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fury-sk {
+    animation: none;
+  }
+}
+
+@media (max-width: 800px) {
+  .fury-sk-coleta-folha,
+  .fury-sk-ajustes-nav {
+    width: 100%;
+  }
+
+  .fury-sk-coleta-corpo,
+  .fury-sk-ajustes {
+    flex-direction: column;
+  }
+
+  .fury-sk-coleta-mapa {
+    min-height: 240px;
+  }
 }
 
 /*
@@ -1010,15 +4283,27 @@ nav.astryx-top-nav > div:first-child {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
   pointer-events: none;
+  transition:
+    top 280ms ease,
+    left 280ms ease,
+    width 280ms ease,
+    height 280ms ease;
+}
+
+.fury-tour-hole.is-live {
+  animation: fury-tour-pulse 1.5s ease-in-out infinite;
 }
 
 .fury-tour-card {
   position: fixed;
   z-index: 82;
-  width: min(400px, calc(100vw - 24px));
+  width: min(440px, calc(100vw - 24px));
   max-height: calc(100vh - 24px);
   overflow: auto;
   outline: none;
+  transition:
+    top 280ms ease,
+    left 280ms ease;
 }
 
 .fury-tour-card > * {
@@ -1037,6 +4322,158 @@ nav.astryx-top-nav > div:first-child {
   height: 100%;
   border-radius: inherit;
   background: var(--color-accent);
+  transition: width 280ms ease;
+}
+
+.fury-tour-live {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--color-success, #12b76a);
+  box-shadow: 0 0 0 0
+    color-mix(in srgb, var(--color-success, #12b76a) 55%, transparent);
+  animation: fury-tour-live 1.6s ease-out infinite;
+}
+
+.fury-tour-copy {
+  display: inline;
+}
+
+.fury-tour-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  animation: fury-caret 1s steps(1) infinite;
+}
+
+.fury-chord-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fury-chord {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.fury-chord:hover {
+  background: color-mix(in srgb, var(--color-accent, #0171e3) 14%, transparent);
+}
+
+.fury-chord.is-next {
+  border-color: var(--color-accent);
+  animation: fury-chord-pulse 1.3s ease-in-out infinite;
+}
+
+.fury-shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fury-command-flash {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  z-index: 90;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  pointer-events: none;
+  animation: fury-command-in 1.6s ease both;
+}
+
+@media (width < 768px) {
+  .fury-command-flash {
+    top: 128px;
+  }
+}
+
+@keyframes fury-tour-pulse {
+  0%,
+  100% {
+    outline-color: var(--color-accent);
+  }
+  50% {
+    outline-color: transparent;
+  }
+}
+
+@keyframes fury-tour-live {
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+@keyframes fury-caret {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fury-chord-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0
+      color-mix(in srgb, var(--color-accent, #0171e3) 45%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+@keyframes fury-command-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  14% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fury-tour-hole,
+  .fury-tour-card,
+  .fury-tour-progress > span,
+  .fury-command-flash {
+    transition: none;
+    animation: none;
+  }
+
+  .fury-tour-hole.is-live,
+  .fury-tour-live,
+  .fury-chord.is-next,
+  .fury-tour-caret {
+    animation: none;
+  }
 }
 
 /* Painéis: embarque do pátio e gráficos de área. */
@@ -1228,75 +4665,6 @@ nav.astryx-top-nav > div:first-child {
   animation: fury-flap 700ms ease;
 }
 
-.fury-metric {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  min-height: 40px;
-}
-
-.fury-metric-value {
-  font-size: 36px;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.045em;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-text-primary);
-}
-
-.fury-flow-card.is-featured .fury-metric-value {
-  font-size: 52px;
-}
-
-.fury-metric-delta {
-  font-size: 14px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.fury-metric-delta[data-sign='up'] {
-  color: var(--color-success);
-}
-
-.fury-metric-delta[data-sign='down'] {
-  color: var(--color-error);
-}
-
-.fury-metric-delta[data-sign='flat'] {
-  color: var(--color-text-secondary);
-}
-
-.fury-metric-delta-label {
-  color: var(--color-text-secondary);
-  font-weight: 500;
-}
-
-.fury-flow-plot {
-  position: relative;
-  width: 100%;
-  touch-action: pan-y;
-  cursor: crosshair;
-}
-
-.fury-flow-plot:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 3px;
-  border-radius: 8px;
-}
-
-.fury-flow-plot svg {
-  display: block;
-}
-
-.fury-flow-axis {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 4px;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-text-secondary);
-}
-
 @keyframes fury-flap {
   0% {
     background: color-mix(in srgb, var(--color-data-categorical-purple) 42%, transparent);
@@ -1329,10 +4697,6 @@ nav.astryx-top-nav > div:first-child {
 @media (max-width: 720px) {
   .fury-yard-clock {
     font-size: 22px;
-  }
-
-  .fury-flow-card.is-featured .fury-metric-value {
-    font-size: 40px;
   }
 
   .fury-yard-head {
@@ -1413,5 +4777,342 @@ nav.astryx-top-nav > div:first-child {
   .fury-yard-table tr.is-fresh td,
   .fury-yard-table tbody tr {
     animation: none;
+  }
+}
+
+/*
+ * Daltonismo só em avisos e ícones. O fundo, o texto e o vermelho do modo
+ * claro ficam como estão. Cada tipo puxa o sinal para um matiz que esse
+ * cone ainda separa; a anomalia anda menos nesse eixo. Acromatopsia deixa
+ * o sinal em cinzas de brilho diferente.
+ */
+html[data-fury-vision='protanopia'] {
+  --fury-vision-error: light-dark(#1d4ed8, #60a5fa);
+  --fury-vision-success: light-dark(#b45309, #fbbf24);
+  --fury-vision-warning: light-dark(#a16207, #fde047);
+  --fury-vision-accent: light-dark(#0e7490, #22d3ee);
+  --fury-vision-error-ink: #fff;
+  --fury-vision-success-ink: #1a1203;
+  --fury-vision-warning-ink: #1a1203;
+  --fury-vision-accent-ink: light-dark(#fff, #042f33);
+}
+html[data-fury-vision='protanomaly'] {
+  --fury-vision-error: light-dark(#be123c, #fb7185);
+  --fury-vision-success: light-dark(#0f766e, #2dd4bf);
+  --fury-vision-warning: light-dark(#a16207, #facc15);
+  --fury-vision-accent: light-dark(#0369a1, #38bdf8);
+  --fury-vision-error-ink: #fff;
+  --fury-vision-success-ink: light-dark(#fff, #042f2e);
+  --fury-vision-warning-ink: #1a1203;
+  --fury-vision-accent-ink: #fff;
+}
+html[data-fury-vision='deuteranopia'] {
+  --fury-vision-error: light-dark(#7e22ce, #c084fc);
+  --fury-vision-success: light-dark(#b45309, #fbbf24);
+  --fury-vision-warning: light-dark(#c2410c, #fb923c);
+  --fury-vision-accent: light-dark(#1d4ed8, #60a5fa);
+  --fury-vision-error-ink: #fff;
+  --fury-vision-success-ink: #1a1203;
+  --fury-vision-warning-ink: #1a1203;
+  --fury-vision-accent-ink: #fff;
+}
+html[data-fury-vision='deuteranomaly'] {
+  --fury-vision-error: light-dark(#be185d, #f472b6);
+  --fury-vision-success: light-dark(#a16207, #eab308);
+  --fury-vision-warning: light-dark(#c2410c, #fb923c);
+  --fury-vision-accent: light-dark(#1d4ed8, #60a5fa);
+  --fury-vision-error-ink: #fff;
+  --fury-vision-success-ink: #1a1203;
+  --fury-vision-warning-ink: #1a1203;
+  --fury-vision-accent-ink: #fff;
+}
+html[data-fury-vision='tritanopia'] {
+  --fury-vision-error: light-dark(#b91c1c, #f87171);
+  --fury-vision-success: light-dark(#15803d, #4ade80);
+  --fury-vision-warning: light-dark(#c2410c, #fb923c);
+  --fury-vision-accent: light-dark(#be123c, #fb7185);
+  --fury-vision-error-ink: #fff;
+  --fury-vision-success-ink: light-dark(#fff, #052e16);
+  --fury-vision-warning-ink: #1a1203;
+  --fury-vision-accent-ink: #fff;
+}
+html[data-fury-vision='tritanomaly'] {
+  --fury-vision-error: light-dark(#be123c, #fb7185);
+  --fury-vision-success: light-dark(#047857, #34d399);
+  --fury-vision-warning: light-dark(#b45309, #fbbf24);
+  --fury-vision-accent: light-dark(#6d28d9, #a78bfa);
+  --fury-vision-error-ink: #fff;
+  --fury-vision-success-ink: light-dark(#fff, #022c22);
+  --fury-vision-warning-ink: #1a1203;
+  --fury-vision-accent-ink: #fff;
+}
+html[data-fury-vision='achromatopsia'] {
+  --fury-vision-error: light-dark(#111111, #ffffff);
+  --fury-vision-success: light-dark(#6b6b6b, #c8c8c8);
+  --fury-vision-warning: light-dark(#3f3f3f, #8a8a8a);
+  --fury-vision-accent: light-dark(#525252, #a3a3a3);
+  --fury-vision-error-ink: light-dark(#ffffff, #111111);
+  --fury-vision-success-ink: light-dark(#ffffff, #111111);
+  --fury-vision-warning-ink: light-dark(#ffffff, #111111);
+  --fury-vision-accent-ink: light-dark(#ffffff, #111111);
+}
+
+html[data-fury-vision] :is(
+  .astryx-icon[data-color='error'],
+  .astryx-icon[data-color='red'],
+  .astryx-icon[data-color='pink']
+) {
+  color: var(--fury-vision-error) !important;
+}
+html[data-fury-vision] :is(
+  .astryx-icon[data-color='success'],
+  .astryx-icon[data-color='green']
+) {
+  color: var(--fury-vision-success) !important;
+}
+html[data-fury-vision] :is(
+  .astryx-icon[data-color='warning'],
+  .astryx-icon[data-color='yellow'],
+  .astryx-icon[data-color='orange']
+) {
+  color: var(--fury-vision-warning) !important;
+}
+html[data-fury-vision] :is(
+  .astryx-icon[data-color='accent'],
+  .astryx-icon[data-color='blue'],
+  .astryx-icon[data-color='cyan'],
+  .astryx-icon[data-color='teal'],
+  .astryx-icon[data-color='purple']
+) {
+  color: var(--fury-vision-accent) !important;
+}
+
+html[data-fury-vision] :is(
+  .astryx-status-dot[data-variant='error'],
+  .astryx-avatar-status-dot[data-variant='error'],
+  .astryx-badge[data-variant='error'],
+  .astryx-badge[data-variant='red'],
+  .astryx-badge[data-variant='pink']
+) {
+  background-color: var(--fury-vision-error) !important;
+  color: var(--fury-vision-error-ink) !important;
+}
+html[data-fury-vision] :is(
+  .astryx-status-dot[data-variant='success'],
+  .astryx-avatar-status-dot[data-variant='success'],
+  .astryx-badge[data-variant='success'],
+  .astryx-badge[data-variant='green']
+) {
+  background-color: var(--fury-vision-success) !important;
+  color: var(--fury-vision-success-ink) !important;
+}
+html[data-fury-vision] :is(
+  .astryx-status-dot[data-variant='warning'],
+  .astryx-badge[data-variant='warning'],
+  .astryx-badge[data-variant='yellow'],
+  .astryx-badge[data-variant='orange']
+) {
+  background-color: var(--fury-vision-warning) !important;
+  color: var(--fury-vision-warning-ink) !important;
+}
+html[data-fury-vision] :is(
+  .astryx-status-dot[data-variant='accent'],
+  .astryx-badge[data-variant='info'],
+  .astryx-badge[data-variant='blue'],
+  .astryx-badge[data-variant='cyan'],
+  .astryx-badge[data-variant='purple'],
+  .fury-header-unread-dot
+) {
+  background-color: var(--fury-vision-accent) !important;
+  color: var(--fury-vision-accent-ink) !important;
+}
+
+/*
+ * Tipografia escolhida em Aparência. O tema recoloca Figtree no elemento
+ * [data-astryx-theme], então a escolha precisa valer ali também. Sistema
+ * deixa o token padrão.
+ */
+html[data-fury-font='serif'],
+html[data-fury-font='serif'] [data-astryx-theme] {
+  --font-family-body: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  --font-family-heading: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+}
+
+html[data-fury-font='mono'],
+html[data-fury-font='mono'] [data-astryx-theme] {
+  --font-family-body: "Cascadia Mono", "SF Mono", ui-monospace, Consolas, monospace;
+  --font-family-heading: "Cascadia Mono", "SF Mono", ui-monospace, Consolas, monospace;
+}
+
+/*
+ * Reduzir movimento: encerra transição e animação no primeiro instante, em
+ * qualquer componente, para o estado final continuar valendo.
+ */
+html[data-fury-reduce-motion='on'] *,
+html[data-fury-reduce-motion='on'] *::before,
+html[data-fury-reduce-motion='on'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
+  scroll-behavior: auto !important;
+}
+
+/* Login SSO: card à esquerda, manifesto em vídeo à direita. */
+.fury-sso {
+  display: grid;
+  grid-template-columns: minmax(440px, 0.92fr) minmax(0, 1.15fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #111111;
+}
+
+.fury-sso-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 48px 40px;
+  background: #fff;
+  --fury-sso-red: #ff0032;
+}
+
+.fury-sso-panel > .astryx-card {
+  background-color: var(--fury-sso-red) !important;
+  border-color: transparent !important;
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(255, 0, 50, 0.22);
+}
+
+.fury-sso-panel .astryx-text,
+.fury-sso-panel .astryx-link,
+.fury-sso-panel .astryx-field-label,
+.fury-sso-panel .astryx-divider,
+.fury-sso-panel .astryx-divider > div {
+  color: #fff !important;
+}
+
+.fury-sso-panel .astryx-text.secondary,
+.fury-sso-panel .astryx-link.secondary {
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+
+.fury-sso-panel .astryx-divider > div {
+  background-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.fury-sso-panel .astryx-divider > div:nth-child(2) {
+  background-color: transparent !important;
+}
+
+.fury-sso-panel .astryx-text-input {
+  background-color: #fff !important;
+  border-color: transparent !important;
+  color: #1a1a1a;
+}
+
+.fury-sso-panel .astryx-text-input input {
+  color: #1a1a1a !important;
+  caret-color: var(--fury-sso-red);
+}
+
+.fury-sso-panel .astryx-text-input input::placeholder {
+  color: rgba(26, 26, 26, 0.46);
+}
+
+.fury-sso-panel .astryx-button.primary {
+  background-color: #fff !important;
+}
+
+.fury-sso-panel .astryx-button.primary,
+.fury-sso-panel .astryx-button.primary span {
+  color: var(--fury-sso-red) !important;
+}
+
+.fury-sso-panel .astryx-button.primary:disabled {
+  opacity: 1 !important;
+  background-color: #fff !important;
+}
+
+.fury-sso-panel .astryx-button.primary:disabled,
+.fury-sso-panel .astryx-button.primary:disabled span {
+  color: rgba(255, 0, 50, 0.4) !important;
+}
+
+.fury-sso-panel .astryx-button.secondary,
+.fury-sso-panel .astryx-button.ghost,
+.fury-sso-panel .astryx-button.secondary span,
+.fury-sso-panel .astryx-button.ghost span {
+  color: #fff !important;
+}
+
+.fury-sso-panel .astryx-button.secondary {
+  background-color: transparent !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.fury-sso-panel .astryx-button.ghost {
+  background-color: transparent !important;
+}
+
+.fury-sso-panel .astryx-card .astryx-card,
+.fury-sso-panel .astryx-section {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  border-color: transparent !important;
+  color: #fff;
+  box-shadow: none;
+}
+
+.fury-sso-panel .astryx-card svg {
+  color: #fff;
+}
+
+.fury-sso-panel .astryx-button.primary svg,
+.fury-sso-panel .astryx-button.primary [role='status'] {
+  color: var(--fury-sso-red) !important;
+}
+
+.fury-sso-provider-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.fury-sso-provider-logo img {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.fury-sso-stage {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #111111;
+}
+
+.fury-sso-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .fury-sso {
+    grid-template-columns: 1fr;
+  }
+
+  .fury-sso-stage {
+    display: none;
   }
 }

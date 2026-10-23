@@ -659,6 +659,79 @@ function formatDate(iso: string, withYear = false): string {
 const formatScheduled = (iso: string) =>
   `${formatDate(iso)}, ${formatTime(iso)}`;
 
+export type EmbarqueAgora = {
+  id: string;
+  placa: string;
+  veiculo: string;
+  destino: string;
+  resumo: string;
+  saida: string;
+  situacao: string;
+  sugerido: boolean;
+  volumes: number;
+  endereco: string;
+};
+
+function embarqueDe(job: ServiceJob, sugerido: boolean): EmbarqueAgora {
+  return {
+    id: job.id,
+    placa: job.technician,
+    veiculo: job.equipment,
+    destino: job.customer,
+    resumo: job.summary,
+    saida: formatScheduled(job.scheduledAt),
+    situacao: STATUS_META[job.status].label,
+    sugerido,
+    volumes: job.quoted,
+    endereco: job.address,
+  };
+}
+
+/** Cargas da tela de Entregas destinadas à associada logada. */
+const CARGAS_DO_ASSOCIADO = new Set([
+  'ENT-2148',
+  'ENT-2141',
+  'ENT-2136',
+  'ENT-2145',
+]);
+
+export const ASSOCIADO = 'Ana Thomas';
+
+/** Carros da tela de Entregas que ainda vão embarcar, o mais próximo da saída primeiro. */
+export function entregasParaEmbarcar(): EmbarqueAgora[] {
+  const agora = Date.now();
+  const porPlaca = new Map<string, {job: ServiceJob; distancia: number}>();
+  for (const job of allJobs) {
+    if (job.status === 'completed') continue;
+    const distancia = Math.abs(Date.parse(job.scheduledAt) - agora);
+    const atual = porPlaca.get(job.technician);
+    if (!atual || distancia < atual.distancia) {
+      porPlaca.set(job.technician, {job, distancia});
+    }
+  }
+  return [...porPlaca.values()]
+    .sort((a, b) => a.distancia - b.distancia)
+    .slice(0, 5)
+    .map(({job}, index) => embarqueDe(job, index === 0));
+}
+
+/** Carregamentos da tela de Entregas que foram destinados ao associado. */
+export function entregasParaMim(): EmbarqueAgora[] {
+  const agora = Date.now();
+  const porPlaca = new Map<string, {job: ServiceJob; distancia: number}>();
+  for (const job of allJobs) {
+    if (!CARGAS_DO_ASSOCIADO.has(job.id) || job.status === 'completed') continue;
+    const distancia = Math.abs(Date.parse(job.scheduledAt) - agora);
+    const atual = porPlaca.get(job.technician);
+    if (!atual || distancia < atual.distancia) {
+      porPlaca.set(job.technician, {job, distancia});
+    }
+  }
+  return [...porPlaca.values()]
+    .sort((a, b) => a.distancia - b.distancia)
+    .map(({job}) => embarqueDe(job, false));
+}
+
 const formatMoney = (amount: number) =>
   `${amount.toLocaleString('pt-BR')} vol`;
 

@@ -283,7 +283,7 @@ export default function HeaderActions({
   };
 
   return (
-    <div className="fury-header-actions">
+    <div className="fury-header-actions fury-header-cluster">
       <HeaderActionPopover
         label="Mensagens"
         unreadLabel="não lidas"

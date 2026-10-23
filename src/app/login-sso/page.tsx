@@ -2,10 +2,9 @@
 
 'use client';
 
-import {useState, type CSSProperties} from 'react';
+import {useState} from 'react';
 import {ShieldCheckIcon} from '@heroicons/react/24/outline';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
-import {Center} from '@astryxdesign/core/Center';
 import {Text} from '@astryxdesign/core/Text';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Button} from '@astryxdesign/core/Button';
@@ -20,26 +19,34 @@ import {Avatar} from '@astryxdesign/core/Avatar';
 // Styles
 // ---------------------------------------------------------------------------
 
-const pageStyle: CSSProperties = {
-  minHeight: '100vh',
-  backgroundImage: "url('/login-bg.png?v=20261003')",
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-};
+const MANIFESTO_VIDEO =
+  'https://cdn-sites-assets.mziq.com/wp-content/uploads/sites/339/2021/06/MANIFESTO32W.mp4';
 
 type SSOProvider = {
   name: string;
   abbr: string;
+  logo?: string;
 };
 const SSO_PROVIDERS: Record<string, SSOProvider> = {
-  'google.com': {name: 'Google Workspace', abbr: 'G'},
-  'microsoft.com': {name: 'Microsoft Entra ID', abbr: 'M'},
+  'google.com': {
+    name: 'Google Workspace',
+    abbr: 'G',
+    logo: '/google-workspace.svg',
+  },
+  'microsoft.com': {
+    name: 'Microsoft Entra ID',
+    abbr: 'M',
+    logo: '/microsoft.svg',
+  },
   'okta.com': {name: 'Okta', abbr: 'O'},
   'meta.com': {name: 'Meta SSO', abbr: 'M'},
   'apple.com': {name: 'Apple Business', abbr: 'A'},
 };
-const DEFAULT_SSO_PROVIDER: SSOProvider = {name: 'SSO', abbr: 'S'};
+const DEFAULT_SSO_PROVIDER: SSOProvider = {
+  name: 'SSO',
+  abbr: 'S',
+  logo: '/microsoft.svg',
+};
 
 function getProvider(email: string) {
   const domain = email.split('@')[1]?.toLowerCase();
@@ -100,7 +107,8 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
   };
 
   return (
-    <Center axis="both" padding={6} style={pageStyle}>
+    <div className="fury-sso">
+      <div className="fury-sso-panel">
       <Card padding={8} width="100%" maxWidth={400}>
         <VStack gap={4} hAlign="stretch">
           {/* ── Step 1: Email entry ── */}
@@ -118,15 +126,15 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
                   }}
                 />
                 <Text type="body" color="secondary" size="sm">
-                  Enter your details to sign in to your account
+                  Informe seus dados para entrar na sua conta
                 </Text>
               </VStack>
 
               <VStack gap={2}>
                 <TextInput
-                  label="Work email"
+                  label="E-mail corporativo"
                   isLabelHidden
-                  placeholder="you@company.com"
+                  placeholder="voce@empresa.com"
                   value={email}
                   onChange={setEmail}
                   size="lg"
@@ -137,10 +145,10 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
                   }}
                 />
                 <TextInput
-                  label="Password"
+                  label="Senha"
                   isLabelHidden
                   type="password"
-                  placeholder="Password"
+                  placeholder="Senha"
                   value={password}
                   onChange={setPassword}
                   size="lg"
@@ -153,11 +161,11 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
               </VStack>
 
               <Link href="#" size="sm" color="secondary" type="supporting">
-                Having trouble signing in?
+                Problemas para entrar?
               </Link>
 
               <Button
-                label="Sign in"
+                label="Entrar"
                 variant="primary"
                 size="lg"
                 isLoading={isLoading}
@@ -165,10 +173,10 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
                 isDisabled={!emailValid}
               />
 
-              <Divider label="Or sign in with" />
+              <Divider label="Ou entre com" />
 
               <Button
-                label="Continue with SSO"
+                label="Continuar com SSO"
                 variant="secondary"
                 size="lg"
                 onClick={handleSSO}
@@ -177,9 +185,9 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
 
               <VStack hAlign="center">
                 <Text type="supporting" color="secondary">
-                  Don&apos;t have an account?{' '}
+                  Não tem uma conta?{' '}
                   <Link href="#" type="supporting">
-                    Request access
+                    Solicitar acesso
                   </Link>
                 </Text>
               </VStack>
@@ -190,12 +198,18 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
           {step === 'sso-confirm' && (
             <>
               <VStack gap={2} hAlign="center">
-                <Avatar name={provider.name} size={48} />
+                {provider.logo ? (
+                  <span className="fury-sso-provider-logo">
+                    <img src={provider.logo} alt="" />
+                  </span>
+                ) : (
+                  <Avatar name={provider.name} size={48} />
+                )}
                 <Text type="display-3" as="h2">
-                  Sign in with {provider.name}
+                  Entrar com {provider.name}
                 </Text>
                 <Text type="body" color="secondary" size="sm">
-                  You will be redirected back after signing in.
+                  Você volta para cá depois de entrar.
                 </Text>
               </VStack>
 
@@ -215,14 +229,14 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
 
               <VStack gap={3}>
                 <Button
-                  label={`Continue with ${provider.name}`}
+                  label={`Continuar com ${provider.name}`}
                   variant="primary"
                   size="lg"
                   isLoading={isLoading}
                   onClick={completeSignIn}
                 />
                 <Button
-                  label="Use a different email"
+                  label="Usar outro e-mail"
                   variant="ghost"
                   size="lg"
                   onClick={handleBack}
@@ -236,7 +250,7 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
             <>
               <VStack gap={1} hAlign="center">
                 <Text type="display-1" as="h2">
-                  Welcome back
+                  Bem-vindo de volta
                 </Text>
                 <Text type="body" color="secondary" size="sm">
                   {email}
@@ -246,7 +260,7 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
               <VStack gap={4}>
                 <VStack gap={1}>
                   <TextInput
-                    label="Password"
+                    label="Senha"
                     type="password"
                     value={password}
                     size="lg"
@@ -258,7 +272,7 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
                       loginFailed
                         ? {
                             type: 'error',
-                            message: 'Incorrect password. Try again.',
+                            message: 'Senha incorreta. Tente de novo.',
                           }
                         : undefined
                     }
@@ -270,21 +284,21 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
                         size="sm"
                         color="secondary"
                         type="supporting">
-                        Forgot password?
+                        Esqueceu a senha?
                       </Link>
                     </VStack>
                   )}
                 </VStack>
 
                 <Button
-                  label="Sign in"
+                  label="Entrar"
                   variant="primary"
                   size="lg"
                   isLoading={isLoading}
                   onClick={handleSignIn}
                 />
                 <Button
-                  label="Use a different email"
+                  label="Usar outro e-mail"
                   variant="ghost"
                   size="lg"
                   onClick={handleBack}
@@ -294,6 +308,19 @@ export default function LoginSSO({onSuccess}: {onSuccess?: () => void}) {
           )}
         </VStack>
       </Card>
-    </Center>
+      </div>
+      <div className="fury-sso-stage" aria-hidden="true">
+        <video
+          className="fury-sso-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+        >
+          <source src={MANIFESTO_VIDEO} type="video/mp4" />
+        </video>
+      </div>
+    </div>
   );
 }

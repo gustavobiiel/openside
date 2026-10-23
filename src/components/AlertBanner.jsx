@@ -6,8 +6,9 @@ const ENTER_MS = 560
 const LEAVE_MS = 380
 
 function prefersReducedMotion() {
-  return typeof window !== 'undefined'
-    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  return typeof document !== 'undefined'
+    && (document.documentElement.dataset.furyReduceMotion === 'on'
+      || window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 }
 
 export default function AlertBanner({ onClose }) {

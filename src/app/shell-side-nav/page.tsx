@@ -2,13 +2,18 @@
 
 'use client';
 
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import ScreenLoading from '../../components/ScreenLoading';
-import {AppShell} from '@astryxdesign/core/AppShell';
+import {AppShell, useAppShellMobile} from '@astryxdesign/core/AppShell';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
 import {Layout, LayoutContent} from '@astryxdesign/core/Layout';
-import {SideNav, SideNavItem, SideNavSection} from '@astryxdesign/core/SideNav';
+import {
+  SideNav,
+  SideNavItem,
+  SideNavSection,
+  useSideNavRenderMode,
+} from '@astryxdesign/core/SideNav';
 import {Avatar, AvatarStatusDot} from '@astryxdesign/core/Avatar';
 import SettingsDialogTemplate from '../settings-dialog/page';
 import SettingsSecurityTemplate from '../settings-sidebar/page';
@@ -16,11 +21,16 @@ import LibraryHome from '../library/LibraryHome';
 import DashboardTemplate from '../dashboard/page';
 import TableFilterTemplate from '../table-filter/page';
 import ColetaExpedicaoTemplate from '../coleta-expedicao/page';
+import MonitoramentoDcp from '../coleta-expedicao/MonitoramentoDcp';
 import AIChatTemplate from '../ai-chat-landing/page';
 import MeireThread from '../ai-chat/MeireThread';
 import WorkspaceScreen, {screenRole} from '../workspace/WorkspaceScreen';
 import {Text} from '@astryxdesign/core/Text';
-import {TopNav, TopNavHeading} from '@astryxdesign/core/TopNav';
+import {
+  TopNav,
+  TopNavHeading,
+  useTopNavRenderMode,
+} from '@astryxdesign/core/TopNav';
 import type {IconType} from '@astryxdesign/core/Icon';
 import {MoreMenu} from '@astryxdesign/core/MoreMenu';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
@@ -54,10 +64,21 @@ import OpsBoard from '../operacao/OpsBoard';
 import {OPS_BOARDS, type OpsPanel} from '../operacao/boards';
 import FirstAccessTour, {
   type TourChoice,
+  type TourVisit,
 } from '../onboarding/FirstAccessTour';
+import CommandFlash, {ShortcutSheet} from '../../fury/CommandFlash';
 import {
+  commandById,
+  matchShellCommand,
+  type ShellCommand,
+  type ShellCommandId,
+} from '../../fury/shellCommands';
+import {
+  ClockIcon,
   PlusIcon,
+  ServerStackIcon,
   SparklesIcon,
+  ViewColumnsIcon,
   ChartBarIcon,
   BookOpenIcon,
   Cog6ToothIcon,
@@ -171,6 +192,40 @@ const CHAT_RECORD_PAGE: Record<string, string> = {
   Motoristas: 'motoristas',
 };
 
+function placeName(panel: Panel, selectedChat: string | null): string {
+  if (panel === 'chat') {
+    return selectedChat ?? 'a conversa';
+  }
+  if (panel === 'meire' || panel === 'meire-chat') {
+    return 'Meire';
+  }
+  if (panel === 'dashboards') {
+    return 'Painéis';
+  }
+  if (panel === 'library') {
+    return 'Library';
+  }
+  if (panel === 'help') {
+    return 'Central de ajuda';
+  }
+  if (panel === 'sla') {
+    return 'SLA';
+  }
+  if (panel === 'servidores') {
+    return 'Servidores';
+  }
+  if (panel === 'docas') {
+    return 'Docas';
+  }
+  if (panel === 'profile') {
+    return 'sua conta';
+  }
+  if (panel === 'settings') {
+    return 'ajustes';
+  }
+  return 'início';
+}
+
 const INITIAL_MEIRE_CHATS: MeireChat[] = [
   {id: 'jwt', title: 'JWT Token Refresh', isNew: false},
   {id: 'rota', title: 'Atraso na rota SP–RJ', isNew: false},
@@ -195,10 +250,16 @@ type HeaderChatFrame = {
  * Encaixa a pesquisa na faixa do TopNav: a borda esquerda acompanha a alça
  * do SideNav, e a direita para antes do usuário.
  */
-function useHeaderChatFrame(sideNavEl: HTMLElement | null): HeaderChatFrame | null {
+function useHeaderChatFrame(
+  sideNavEl: HTMLElement | null,
+  enabled = true,
+): HeaderChatFrame | null {
   const [frame, setFrame] = useState<HeaderChatFrame | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     const lane = document.querySelector('nav.astryx-top-nav > div');
     const panel = sideNavEl?.parentElement;
     if (!(lane instanceof HTMLElement) || !panel || !sideNavEl) {
@@ -261,7 +322,7 @@ function useHeaderChatFrame(sideNavEl: HTMLElement | null): HeaderChatFrame | nu
       observer.disconnect();
       window.removeEventListener('resize', measure);
     };
-  }, [sideNavEl]);
+  }, [sideNavEl, enabled]);
 
   return frame;
 }
@@ -277,7 +338,7 @@ function answerHelp(question: string): string {
     return 'O SLA fica no ícone de relógio, ao lado do perfil. A tabela agrupa em estourado, em risco e no prazo. Recalcular prazos atualiza a folga com a última posição.';
   }
   if (/coleta|expedi|doca|carreg/.test(q)) {
-    return 'Coleta e Expedição começa pela placa. Com a placa válida, o operador informa doca, cordas e tapumes e já entra no carregamento. A ocupação ao vivo das docas fica no ícone de colunas, ao lado do perfil: em carga, livre, bloqueada ou em manutenção, agrupado por centro.';
+    return 'Coleta e Expedição abre com a viagem e o veículo já preenchidos pelo sistema: tipologia, peso, lojas e a saída. O operador confirma a etapa e o carrossel segue. A ocupação ao vivo das docas fica no ícone de colunas, ao lado do perfil: em carga, livre, bloqueada ou em manutenção, agrupado por centro.';
   }
   if (/frota|ve[ií]culo|motorista|rota/.test(q)) {
     return 'Frota cobre veículos, motoristas e rotas. Veículo ativo tem ponto verde. Motorista e rota ociosos ficam com o ponto neutro, parado.';
@@ -363,15 +424,18 @@ function HeaderSearch({
   items,
   onSelect,
   onStartChat,
+  docked = false,
 }: {
   sideNavEl: HTMLElement | null;
   items: AppSearchItem[];
   onSelect: (item: AppSearchItem, typed: string, via: SearchVia) => void;
   onStartChat: (text: string) => void;
+  /** Faixa inteira, embaixo do topo. No celular a pesquisa não cabe na linha dos ícones. */
+  docked?: boolean;
 }) {
   const [draft, setDraft] = useState('');
   const [fieldKey, setFieldKey] = useState(0);
-  const frame = useHeaderChatFrame(sideNavEl);
+  const frame = useHeaderChatFrame(sideNavEl, !docked);
   const searchSource = useMemo<SearchSource<AppSearchItem>>(
     () => ({
       search: query => searchApp(items, query),
@@ -379,19 +443,6 @@ function HeaderSearch({
     }),
     [items],
   );
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        document
-          .querySelector<HTMLInputElement>('.fury-header-search input')
-          ?.focus();
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
-  }, []);
 
   const submitQuery = (text: string) => {
     const clean = text.trim();
@@ -442,16 +493,19 @@ function HeaderSearch({
     return () => window.removeEventListener('keydown', onEnter, true);
   }, [items, onSelect, onStartChat]);
 
-  if (!frame || frame.width <= 0) {
+  if (!docked && (!frame || frame.width <= 0)) {
     return null;
   }
 
   return (
       <div
-      className="fury-header-chat"
+      className={docked ? 'fury-header-chat is-docked' : 'fury-header-chat'}
       data-tour="busca"
-      style={{left: frame.left, width: frame.width}}>
-      <Stack direction="vertical" width={HEADER_CHAT_WIDTH} maxWidth="100%">
+      style={docked ? undefined : {left: frame?.left, width: frame?.width}}>
+      <Stack
+        direction="vertical"
+        width={docked ? '100%' : HEADER_CHAT_WIDTH}
+        maxWidth="100%">
         <ChatComposer
           value={draft}
           onChange={setDraft}
@@ -506,6 +560,214 @@ function HeaderSearch({
           }
         />
       </Stack>
+    </div>
+  );
+}
+
+/**
+ * Atalhos que no desktop ficam no topo e, no celular, passam para o menu.
+ * Mensagens, avisos e o modo claro continuam na barra.
+ */
+function MobileOpsLinks({
+  panel,
+  onOpen,
+}: {
+  panel: Panel;
+  onOpen: (next: Panel) => void;
+}) {
+  const mode = useSideNavRenderMode();
+  if (mode !== 'drawer-content') {
+    return null;
+  }
+
+  const open = (next: Panel) => (event: {preventDefault: () => void}) => {
+    event.preventDefault();
+    onOpen(next);
+  };
+
+  return (
+    <>
+      <SideNavSection title="Operação" isHeaderHidden>
+        <SideNavItem
+          label="Servidores"
+          icon={ServerStackIcon}
+          href="#"
+          isSelected={panel === 'servidores'}
+          onClick={open('servidores')}
+        />
+        <SideNavItem
+          label="Docas"
+          icon={ViewColumnsIcon}
+          href="#"
+          isSelected={panel === 'docas'}
+          onClick={open('docas')}
+        />
+        <SideNavItem
+          label="SLA"
+          icon={ClockIcon}
+          href="#"
+          isSelected={panel === 'sla'}
+          onClick={open('sla')}
+        />
+        <SideNavItem
+          label="Central de ajuda"
+          icon={QuestionMarkCircleIcon}
+          href="#"
+          data-tour="ajuda"
+          isSelected={panel === 'help'}
+          onClick={open('help')}
+        />
+      </SideNavSection>
+      <Divider />
+    </>
+  );
+}
+
+function MobileNavBridge({
+  closeRef,
+}: {
+  closeRef: {current: () => void};
+}) {
+  const {closeMobileNav} = useAppShellMobile();
+  useEffect(() => {
+    closeRef.current = closeMobileNav;
+  }, [closeMobileNav, closeRef]);
+  return null;
+}
+
+function ShellLogo() {
+  return (
+    <TopNavHeading
+      logoLabel="Início"
+      headingHref={`${import.meta.env.BASE_URL}fury.html`}
+      onClick={event => {
+        event.preventDefault();
+        window.location.reload();
+      }}
+      logo={
+        <img
+          src={`${import.meta.env.BASE_URL}fury-logo.png`}
+          alt=""
+          width={46}
+          height={46}
+          style={{display: 'block'}}
+        />
+      }
+    />
+  );
+}
+
+/**
+ * No celular a barra fica logo, mensagens, avisos, modo claro e o perfil.
+ * A pergunta para a Meire desce para uma faixa própria. Ajuda, servidores,
+ * docas e SLA vão para o menu.
+ */
+function ShellTop({
+  sideNavEl,
+  items,
+  panel,
+  onSelect,
+  onStartChat,
+  onOpenPanel,
+  onOpenChat,
+}: {
+  sideNavEl: HTMLElement | null;
+  items: AppSearchItem[];
+  panel: Panel;
+  onSelect: (item: AppSearchItem, typed: string, via: SearchVia) => void;
+  onStartChat: (text: string) => void;
+  onOpenPanel: (next: Panel) => void;
+  onOpenChat: (chat: string) => void;
+}) {
+  const mode = useTopNavRenderMode();
+  if (mode === 'drawer') {
+    return <TopNav label="Navegação principal" heading={<ShellLogo />} />;
+  }
+
+  const compact = mode === 'mobile-bar';
+  const search = (
+    <HeaderSearch
+      sideNavEl={sideNavEl}
+      items={items}
+      onSelect={onSelect}
+      onStartChat={onStartChat}
+      docked={compact}
+    />
+  );
+
+  return (
+    <div className={compact ? 'fury-shell-top is-compact' : 'fury-shell-top'}>
+      <TopNav
+        label="Navegação principal"
+        style={{minHeight: compact ? 56 : 64, paddingInline: compact ? 12 : 16}}
+        heading={<ShellLogo />}
+        startContent={compact ? null : search}
+        endContent={
+          <>
+            {compact ? null : (
+              <Button
+                label="Central de ajuda"
+                variant="ghost"
+                size="sm"
+                data-tour="ajuda"
+                icon={<Icon icon={QuestionMarkCircleIcon} size="sm" />}
+                onClick={() => onOpenPanel('help')}
+              />
+            )}
+            {compact ? null : (
+              <OpsHeader
+                active={
+                  panel === 'servidores' || panel === 'docas' || panel === 'sla'
+                    ? panel
+                    : null
+                }
+                onSelect={next =>
+                  onOpenPanel(panel === next ? 'library' : next)
+                }
+              />
+            )}
+            <HeaderActions onOpenChat={onOpenChat} />
+            <button
+              type="button"
+              className="fury-profile"
+              data-tour="perfil"
+              aria-label="Ana Thomas, Analista de logística"
+              onClick={() => onOpenPanel('profile')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--spacing-3)',
+                margin: 0,
+                padding: 0,
+                border: 'none',
+                background: 'none',
+                color: 'inherit',
+                font: 'inherit',
+                textAlign: 'start',
+                cursor: 'pointer',
+              }}>
+              <Avatar
+                src={`${import.meta.env.BASE_URL}template-assets/DATA-Ana-Thomas.png`}
+                fallbackSrc={`${import.meta.env.BASE_URL}template-assets/DATA-Ami-Pena.png`}
+                name="Ana Thomas"
+                shape="circle"
+                status={<AvatarStatusDot variant="success" label="Online" />}
+              />
+              {compact ? null : (
+                <Stack direction="vertical" gap={0}>
+                  <Text type="body" weight="bold" maxLines={1}>
+                    Ana Thomas
+                  </Text>
+                  <Text type="supporting" color="secondary" maxLines={1}>
+                    Analista de logística
+                  </Text>
+                </Stack>
+              )}
+            </button>
+          </>
+        }
+      />
+      {compact ? <div className="fury-mobile-search">{search}</div> : null}
     </div>
   );
 }
@@ -726,7 +988,7 @@ function ConversationItem({
   );
 }
 
-export default function ShellSideNav() {
+export default function ShellSideNav({onLogout}: {onLogout?: () => void}) {
   // Callback ref via estado: o <nav> é remontado quando o menu recolhe
   // (a alça de redimensionar some), e o efeito precisa reanexar os handlers.
   const [sideNavEl, setSideNavEl] = useState<HTMLElement | null>(null);
@@ -758,6 +1020,17 @@ export default function ShellSideNav() {
   });
   const [farewell, setFarewell] = useState<{screen: string} | null>(null);
   const [farewellOpen, setFarewellOpen] = useState(false);
+  const [visit, setVisit] = useState<TourVisit | null>(null);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [flash, setFlash] = useState<{
+    nonce: number;
+    command: ShellCommand;
+  } | null>(null);
+  const commandStamp = useRef(0);
+  const flashTimer = useRef<number | null>(null);
+  const runCommandRef = useRef<(id: ShellCommandId) => void>(() => {});
+  const closeMobileNavRef = useRef<() => void>(() => {});
+  const seenScreen = useRef<string | null>(null);
   useDragToScroll(sideNavEl);
 
   const toggleFavorite = (key: string) =>
@@ -779,12 +1052,14 @@ export default function ShellSideNav() {
     });
 
   const openChat = (label: string) => {
+    closeMobileNavRef.current();
     setPageFocus(null);
     setSelectedChat(label);
     setPanel('chat');
   };
 
   const openNamedPanel = (next: Panel) => {
+    closeMobileNavRef.current();
     setPageFocus(null);
     setPanel(next);
     if (next === 'meire') {
@@ -838,6 +1113,41 @@ export default function ShellSideNav() {
   const isScreenLoading = loadedScreen !== screenKey;
 
   useEffect(() => {
+    if (seenScreen.current === screenKey) {
+      return;
+    }
+    const previous = seenScreen.current;
+    seenScreen.current = screenKey;
+    if (previous === null || Date.now() - commandStamp.current < 400) {
+      return;
+    }
+    setVisit({
+      nonce: Date.now(),
+      place: placeName(panel, selectedChat),
+      commandId: null,
+    });
+  }, [screenKey, panel, selectedChat]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const command = matchShellCommand(event);
+      if (!command) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      runCommandRef.current(command.id);
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown, true);
+      if (flashTimer.current) {
+        window.clearTimeout(flashTimer.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (!farewell) {
       return;
     }
@@ -868,6 +1178,7 @@ export default function ShellSideNav() {
     meireChats.find(chat => chat.id === activeMeireChatId) ?? null;
 
   const openMeireChat = (chatId: string) => {
+    closeMobileNavRef.current();
     setActiveMeireChatId(chatId);
     setPanel('meire-chat');
     setIsMeireCollapsed(false);
@@ -932,6 +1243,68 @@ export default function ShellSideNav() {
     }
   };
 
+  const showFlash = (command: ShellCommand) => {
+    setFlash({nonce: Date.now(), command});
+    if (flashTimer.current) {
+      window.clearTimeout(flashTimer.current);
+    }
+    flashTimer.current = window.setTimeout(() => {
+      setFlash(null);
+      flashTimer.current = null;
+    }, 1700);
+  };
+
+  runCommandRef.current = (id: ShellCommandId) => {
+    const command = commandById(id);
+    showFlash(command);
+    if (id === 'search') {
+      document
+        .querySelector<HTMLInputElement>('.fury-header-search input')
+        ?.focus();
+      setVisit({nonce: Date.now(), place: 'Busca', commandId: 'search'});
+      return;
+    }
+    if (id === 'atalhos') {
+      if (tourOpen) {
+        setVisit({nonce: Date.now(), place: 'Atalhos', commandId: 'atalhos'});
+      } else {
+        setShortcutsOpen(current => !current);
+      }
+      return;
+    }
+    setShortcutsOpen(false);
+    commandStamp.current = Date.now();
+    switch (id) {
+      case 'meire':
+        openNamedPanel('meire');
+        break;
+      case 'expedicao':
+        openChat('Carregamento');
+        break;
+      case 'ocorrencias':
+        openChat('Ocorrências');
+        break;
+      case 'alertas':
+        openChat('Alertas');
+        break;
+      case 'paineis':
+        openNamedPanel('dashboards');
+        break;
+      case 'library':
+        openNamedPanel('library');
+        break;
+      case 'ajuda':
+        openNamedPanel('help');
+        break;
+      case 'sla':
+        openNamedPanel('sla');
+        break;
+      default:
+        return;
+    }
+    setVisit({nonce: Date.now(), place: command.place, commandId: id});
+  };
+
   const activeWorkspace = WORKSPACES.find(workspace =>
     workspace.chats.some(chat => chat.label === selectedChat),
   );
@@ -955,95 +1328,14 @@ export default function ShellSideNav() {
     <AppShell
       contentPadding={0}
       topNav={
-        <TopNav
-          label="Navegação principal"
-          style={{minHeight: 64, paddingInline: 16}}
-          heading={
-            <TopNavHeading
-              logoLabel="Início"
-              headingHref={`${import.meta.env.BASE_URL}fury.html`}
-              onClick={event => {
-                event.preventDefault();
-                window.location.reload();
-              }}
-              logo={
-                <img
-                  src={`${import.meta.env.BASE_URL}fury-logo.png`}
-                  alt=""
-                  width={46}
-                  height={46}
-                  style={{display: 'block'}}
-                />
-              }
-            />
-          }
-          startContent={
-            <HeaderSearch
-              sideNavEl={sideNavEl}
-              items={searchItems}
-              onSelect={openSearchResult}
-              onStartChat={beginMeireChat}
-            />
-          }
-          endContent={
-            <>
-              <Button
-                label="Central de ajuda"
-                variant="ghost"
-                size="sm"
-                data-tour="ajuda"
-                icon={<Icon icon={QuestionMarkCircleIcon} size="sm" />}
-                onClick={() => openNamedPanel('help')}
-              />
-              <OpsHeader
-                active={
-                  panel === 'servidores' || panel === 'docas' || panel === 'sla'
-                    ? panel
-                    : null
-                }
-                onSelect={next =>
-                  openNamedPanel(panel === next ? 'library' : next)
-                }
-              />
-              <HeaderActions
-                onOpenChat={openChat}
-              />
-              <button
-                type="button"
-                data-tour="perfil"
-                aria-label="Ana Thomas, Analista de logística"
-                onClick={() => openNamedPanel('profile')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 'var(--spacing-3)',
-                  margin: 0,
-                  padding: 0,
-                  border: 'none',
-                  background: 'none',
-                  color: 'inherit',
-                  font: 'inherit',
-                  textAlign: 'start',
-                  cursor: 'pointer',
-                }}>
-                <Avatar
-                  src={`${import.meta.env.BASE_URL}template-assets/DATA-Ana-Thomas.png`}
-                  fallbackSrc={`${import.meta.env.BASE_URL}template-assets/DATA-Ami-Pena.png`}
-                  name="Ana Thomas"
-                  shape="circle"
-                  status={<AvatarStatusDot variant="success" label="Online" />}
-                />
-                <Stack direction="vertical" gap={0}>
-                  <Text type="body" weight="bold" maxLines={1}>
-                    Ana Thomas
-                  </Text>
-                  <Text type="supporting" color="secondary" maxLines={1}>
-                    Analista de logística
-                  </Text>
-                </Stack>
-              </button>
-            </>
-          }
+        <ShellTop
+          sideNavEl={sideNavEl}
+          items={searchItems}
+          panel={panel}
+          onSelect={openSearchResult}
+          onStartChat={beginMeireChat}
+          onOpenPanel={openNamedPanel}
+          onOpenChat={openChat}
         />
       }
       sideNav={
@@ -1052,9 +1344,9 @@ export default function ShellSideNav() {
           collapsible
           resizable={{defaultWidth: 300, minWidth: 220, maxWidth: 420}}
           footer={
-            <SideNavSection title="Account" isHeaderHidden>
+            <SideNavSection title="Conta" isHeaderHidden>
               <SideNavItem
-                label="Settings"
+                label="Configurações"
                 icon={Cog6ToothIcon}
                 href="#"
                 isSelected={panel === 'settings'}
@@ -1066,6 +1358,7 @@ export default function ShellSideNav() {
               <SideNavItem label="Sarah Chen" icon={UserCircleIcon} href="#" />
             </SideNavSection>
           }>
+          <MobileOpsLinks panel={panel} onOpen={openNamedPanel} />
           <SideNavSection title="Menu" isHeaderHidden data-tour="menu">
             <SideNavItem
               label="New chat"
@@ -1187,12 +1480,16 @@ export default function ShellSideNav() {
           </SideNavSection>
         </SideNav>
       }>
+      <MobileNavBridge closeRef={closeMobileNavRef} />
       {isScreenLoading ? (
-        <ScreenLoading />
+        <ScreenLoading screen={screenKey} />
       ) : panel === 'profile' ? (
         <SettingsSecurityTemplate />
       ) : panel === 'settings' ? (
-        <SettingsDialogTemplate onClose={() => openNamedPanel('library')} />
+        <SettingsDialogTemplate
+          onClose={() => openNamedPanel('library')}
+          onLogout={onLogout}
+        />
       ) : panel === 'dashboards' ? (
         <DashboardTemplate />
       ) : panel === 'meire' ? (
@@ -1219,6 +1516,8 @@ export default function ShellSideNav() {
           title={activeMeireChat.title}
           opening={meireOpenings[activeMeireChat.id]}
         />
+      ) : panel === 'chat' && selectedChat === 'Monitoramento' ? (
+        <MonitoramentoDcp />
       ) : panel === 'chat' && selectedChat === 'Entregas' ? (
         <TableFilterTemplate
           key={`entregas:${focusQuery}:${focusRecord ?? ''}`}
@@ -1261,9 +1560,17 @@ export default function ShellSideNav() {
         />
       )}
     </AppShell>
+    {flash ? <CommandFlash key={flash.nonce} command={flash.command} /> : null}
+    <ShortcutSheet
+      open={shortcutsOpen && !tourOpen}
+      onOpenChange={setShortcutsOpen}
+      onRun={id => runCommandRef.current(id)}
+    />
     <FirstAccessTour
       open={tourOpen}
       workspaces={WORKSPACES}
+      visit={visit}
+      onRunCommand={id => runCommandRef.current(id)}
       onComplete={completeTour}
     />
     <Dialog
@@ -1282,7 +1589,7 @@ export default function ShellSideNav() {
               <Stack direction="horizontal" gap={3} vAlign="center">
                 <Avatar name="Meire" size="md" />
                 <Text type="body">
-                  {`Te deixei na tela ${selectedChat ?? 'do seu setor'}. Qualquer coisa, é só me chamar.`}
+                  {`Te deixei na tela ${selectedChat ?? 'do seu setor'}. Os atalhos continuam valendo — Ctrl+Shift+/ mostra a lista. Qualquer coisa, é só me chamar.`}
                 </Text>
               </Stack>
               <Stack direction="horizontal" hAlign="end">

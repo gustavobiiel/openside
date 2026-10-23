@@ -1,0 +1,78 @@
+/*
+ * CSS copiado da página de viagens da Uber. As regras repetidas são os
+ * ajustes de largura de tela, na ordem em que o navegador devolveu.
+ */
+._css-litYGX { flex: 1 1 0%; overflow-y: auto; overscroll-behavior: none; padding-top: 32px; width: 100%; min-height: 0; }
+._css-bpwAbk { align-self: center; display: flex; gap: 32px; margin-left: auto; margin-right: auto; max-width: 1312px; min-height: 100%; padding-bottom: 32px; padding-left: 16px; padding-right: 16px; width: 100%; }
+._css-bpwAbk { max-width: 1344px; padding-left: 32px; padding-right: 32px; }
+._css-bpwAbk { max-width: 1408px; padding-left: 64px; padding-right: 64px; }
+._css-gFGkyz { flex: 1 1 0%; min-width: 0px; }
+._css-dwNlsP { -webkit-box-align: stretch; align-items: stretch; background-color: rgb(255, 255, 255); border-radius: 12px; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; flex-direction: column; overflow: hidden; padding: 0px; position: relative; text-align: start; width: 100%; box-shadow: rgba(255, 255, 255, 0) 999px 999px 0px inset; color: rgb(17, 17, 17); border-style: solid; border-width: 2px; border-color: rgba(196, 196, 196, 0.45); cursor: pointer; }
+._css-dwNlsP:focus { outline: rgb(39, 110, 241) solid 3px; outline-offset: -3px; }
+._css-dwNlsP:hover::after { content: ""; width: 100%; height: 100%; z-index: 1; position: absolute; top: 0px; left: 0px; background-color: rgba(0, 0, 0, 0.04); }
+._css-dwNlsP:active::after { content: ""; width: 100%; height: 100%; z-index: 1; position: absolute; top: 0px; left: 0px; background-color: rgba(0, 0, 0, 0.08); }
+._css-gKpboi { font-family: UberMove, UberMoveText, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: calc(1.25rem); line-height: calc(1.5rem); font-weight: 700; letter-spacing: 0.35px; }
+._css-iqRPel { -webkit-box-align: stretch; align-items: stretch; background-color: rgb(255, 255, 255); border-radius: 12px; display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; overflow: hidden; padding: 0px; position: relative; text-align: start; width: 100%; box-shadow: rgba(255, 255, 255, 0) 999px 999px 0px inset; color: rgb(17, 17, 17); border-style: solid; border-width: 2px; border-color: rgba(196, 196, 196, 0.45); cursor: pointer; }
+._css-iqRPel:focus { outline: rgb(39, 110, 241) solid 3px; outline-offset: -3px; }
+._css-iqRPel:hover::after { content: ""; width: 100%; height: 100%; z-index: 1; position: absolute; top: 0px; left: 0px; background-color: rgba(0, 0, 0, 0.04); }
+._css-iqRPel:active::after { content: ""; width: 100%; height: 100%; z-index: 1; position: absolute; top: 0px; left: 0px; background-color: rgba(0, 0, 0, 0.08); }
+._css-KOcqf { display: none; width: 224px; }
+._css-KOcqf { display: block; }
+._css-dvLxxC { position: sticky; top: 0px; }
+._css-cPcZJQ { font-family: UberMoveText, UberMove, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 1rem; line-height: calc(1.25rem); font-weight: 400; letter-spacing: -0.05px; color: rgb(17, 17, 17); list-style-type: none; margin: 0px; padding: 0px; }
+._css-ddfvmK { list-style-type: none; margin: 0px; padding: 0px; }
+._css-kUXEDL { color: inherit; outline: none; text-decoration: none; }
+._css-kUXEDL:focus > div { outline: none; }
+._css-gLFUf { background-color: transparent; box-sizing: border-box; border-left: 4px solid transparent; cursor: pointer; padding: 12px 12px 12px calc(24px); }
+._css-gLFUf:hover { color: rgb(17, 17, 17); background-color: rgb(246, 246, 246); }
+._css-gLFUf:focus { color: rgb(17, 17, 17); }
+._css-hdjfHk { display: flex; margin-right: 8px; }
+._css-iLgNUW { display: inline-flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; -webkit-box-align: center; align-items: center; -webkit-box-pack: center; justify-content: center; border-width: 0px; border-style: none; outline: none; box-sizing: border-box; box-shadow: none; text-decoration: none; appearance: none; transition-property: background; transition-duration: 200ms; transition-timing-function: cubic-bezier(0, 0, 1, 1); cursor: pointer; margin: 0px; font-family: UberMove, UberMoveText, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: calc(0.875rem); line-height: calc(1.125rem); font-weight: 500; letter-spacing: 0.33px; border-radius: 999px; padding: 10px 12px; color: rgb(17, 17, 17); background-color: rgb(246, 246, 246); }
+._css-iLgNUW:disabled { cursor: not-allowed; background-color: rgba(224, 224, 224, 0.6); color: rgb(196, 196, 196); }
+._css-iLgNUW:focus-visible { box-shadow: rgb(252, 252, 252) 0px 0px 0px 2px inset, rgb(39, 110, 241) 0px 0px 0px 2px; }
+._css-iLgNUW:hover { box-shadow: rgba(17, 17, 17, 0.06) 999px 999px 0px inset; }
+._css-iLgNUW:active { box-shadow: rgba(17, 17, 17, 0.1) 999px 999px 0px inset; }
+._css-djdsPq { -webkit-box-align: end; align-items: flex-end; display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; -webkit-box-pack: justify; justify-content: space-between; margin-bottom: 20px; margin-top: 0px; }
+._css-gOgiKx { background-image: url("https://d3i4yxtzktqr9n.cloudfront.net/riders-web-v2/a95297b322004db9.svg"); background-size: cover; background-position: center center; height: 132px; width: 100%; }
+._css-bRnvUu { width: 100%; box-sizing: border-box; padding: 16px 8px 16px 16px; color: rgb(17, 17, 17); }
+._css-iKcfTw { display: inline-flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; -webkit-box-align: center; align-items: center; -webkit-box-pack: center; justify-content: center; border-width: 0px; border-style: none; outline: none; box-sizing: border-box; box-shadow: none; text-decoration: none; appearance: none; transition-property: background; transition-duration: 200ms; transition-timing-function: cubic-bezier(0, 0, 1, 1); cursor: pointer; margin: 12px 0px 0px; font-family: UberMove, UberMoveText, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: calc(0.875rem); line-height: calc(1.125rem); font-weight: 500; letter-spacing: 0.33px; border-radius: 999px; padding: 10px 12px; color: rgb(17, 17, 17); background-color: rgb(246, 246, 246); text-align: center; pointer-events: none; }
+._css-iKcfTw:disabled { cursor: not-allowed; background-color: rgba(224, 224, 224, 0.6); color: rgb(196, 196, 196); }
+._css-iKcfTw:focus-visible { box-shadow: rgb(252, 252, 252) 0px 0px 0px 2px inset, rgb(39, 110, 241) 0px 0px 0px 2px; }
+._css-iKcfTw:hover { box-shadow: rgba(17, 17, 17, 0.06) 999px 999px 0px inset; }
+._css-iKcfTw:active { box-shadow: rgba(17, 17, 17, 0.1) 999px 999px 0px inset; }
+._css-jBBTcO { display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-flow: row; gap: 12px; -webkit-box-pack: end; justify-content: flex-end; }
+._css-hTUclS { font-family: UberMoveText, UberMove, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: calc(0.75rem); line-height: 1rem; font-weight: 400; letter-spacing: -0.05px; box-sizing: border-box; position: relative; width: max-content; }
+._css-kAcSwP { border-radius: 38px; box-sizing: border-box; overflow: hidden; width: 100%; display: flex; -webkit-box-pack: justify; justify-content: space-between; cursor: pointer; border-width: 2px; border-style: solid; transition-property: border, box-shadow, background-color; transition-duration: 200ms; transition-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1); color: rgb(17, 17, 17); border-color: rgba(196, 196, 196, 0.45); background-color: rgb(246, 246, 246); }
+._css-ibWDkF { -webkit-box-align: center; align-items: center; display: flex; font-weight: 500; padding-left: 10px; }
+._css-jtYWAX { box-sizing: border-box; position: relative; -webkit-box-flex: 1; flex: 1 1 0%; display: flex; -webkit-box-align: center; align-items: center; flex-wrap: nowrap; overflow: hidden; padding: 4px 0px 4px 10px; width: fit-content; }
+@media (max-width: 599px) {
+  ._css-jtYWAX { padding-left: 0px; padding-right: 0px; width: 0px; }
+}
+._css-kdPLSL { line-height: 1rem; box-sizing: border-box; margin-left: 2px; height: 100%; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
+._css-KuiYn { position: relative; display: inline-block; max-width: 100%; background-color: transparent; border-style: none; box-shadow: none; box-sizing: border-box; outline: none; margin: 0px 0px 0px 2px; padding: 0px; height: 1rem; max-height: 1rem; }
+._css-jYsWkC { box-sizing: border-box; position: relative; display: flex; flex-shrink: 0; -webkit-box-align: center; align-items: center; align-self: stretch; padding-right: 12px; }
+._css-iccmsU { box-sizing: border-box; position: relative; -webkit-box-flex: 1; flex: 1 1 0%; display: flex; -webkit-box-align: center; align-items: center; flex-wrap: nowrap; overflow: hidden; padding: 4px 0px 4px 10px; }
+._css-kyTocR { margin-bottom: 20px; margin-top: 0px; }
+._css-eUmhnn { width: 100%; box-sizing: border-box; padding: 12px; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; flex-direction: column; min-width: 0px; overflow-wrap: anywhere; }
+._css-jHwrws { display: grid; gap: 20px; grid-template-columns: repeat(1, 1fr); width: 100%; }
+._css-joplJe { display: inline-block; width: 100%; }
+._css-eqMetn { color: rgb(17, 17, 17); font-family: UberMove, UberMoveText, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 700; font-size: calc(1.75rem); line-height: calc(2rem); letter-spacing: 0.35px; margin-top: 0px; margin-bottom: 0px; text-overflow: ellipsis; }
+._css-dptVFC { -webkit-box-align: end; align-items: flex-end; display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; -webkit-box-pack: justify; justify-content: space-between; margin-bottom: 20px; margin-top: 40px; }
+._css-hZWkjD { background-image: url("https://static-maps.uber.com/map?width=540&height=200&marker=lat%3A-23.53861%24lng%3A-46.91794%24icon%3Ahttps%3A%2F%2Fd1a3f4spazzrp4.cloudfront.net%2Freceipt-new%2Forigin%402x.png&marker=lat%3A-23.54933%24lng%3A-46.92283%24icon%3Ahttps%3A%2F%2Fd1a3f4spazzrp4.cloudfront.net%2Freceipt-new%2Fdestination%402x.png&polyline=color%3A0xFF000000%24width%3A4%24enc%3AhktnCbtj%7DGkAx%40HbCuF%7EBBfAtH%5C%60GbB%7CGjH%7CDrIfD%7DJrHDnE%7CApCAxEjDbAnJxAjBp%40oBc%40uFzD%7BD&source=769a605b_1c9b_3da4_a486_ccc264a18174&signature=GoK8GZ5JvamAwbDbBcp8JI9UQ9Y="); background-size: cover; background-position: center center; width: 300px; order: 0; align-self: center; border-radius: 12px; flex-shrink: 0; margin: 12px 0px 12px 12px; height: 180px; }
+._css-dbNMvL { font-family: UberMove, UberMoveText, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: calc(1.25rem); line-height: calc(1.5rem); font-weight: 700; letter-spacing: 0.35px; -webkit-box-orient: vertical; -webkit-line-clamp: 1; display: -webkit-box; overflow: hidden; }
+._css-iLjhkV { font-family: UberMoveText, UberMove, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: calc(0.875rem); line-height: calc(1.125rem); font-weight: 400; letter-spacing: -0.05px; display: flex; flex: 1 1 0%; -webkit-box-orient: vertical; -webkit-box-direction: normal; flex-direction: column; margin: 0px; z-index: 2; }
+._css-eqvdEW { display: flex; flex: 1 1 0%; -webkit-box-orient: vertical; -webkit-box-direction: normal; flex-direction: column; -webkit-box-pack: justify; justify-content: space-between; }
+._css-hJfHJM { display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; padding-top: 8px; }
+._css-eSXOyD { display: inline-flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; -webkit-box-align: center; align-items: center; -webkit-box-pack: center; justify-content: center; border-width: 0px; border-style: none; outline: none; box-sizing: border-box; box-shadow: none; text-decoration: none; appearance: none; transition-property: background; transition-duration: 200ms; transition-timing-function: cubic-bezier(0, 0, 1, 1); cursor: pointer; margin: 0px; font-family: UberMove, UberMoveText, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: calc(0.75rem); line-height: 1rem; font-weight: 500; letter-spacing: 0.33px; border-radius: 999px; padding: 6px 8px; color: rgb(17, 17, 17); background-color: rgb(246, 246, 246); }
+._css-eSXOyD:disabled { cursor: not-allowed; background-color: rgba(224, 224, 224, 0.6); color: rgb(196, 196, 196); }
+._css-eSXOyD:focus-visible { box-shadow: rgb(252, 252, 252) 0px 0px 0px 2px inset, rgb(39, 110, 241) 0px 0px 0px 2px; }
+._css-eSXOyD:hover { box-shadow: rgba(17, 17, 17, 0.06) 999px 999px 0px inset; }
+._css-eSXOyD:active { box-shadow: rgba(17, 17, 17, 0.1) 999px 999px 0px inset; }
+._css-fbBTWH { display: inline-flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; -webkit-box-align: center; align-items: center; -webkit-box-pack: center; justify-content: center; border-width: 0px; border-style: none; outline: none; box-sizing: border-box; box-shadow: none; text-decoration: none; appearance: none; transition-property: background; transition-duration: 200ms; transition-timing-function: cubic-bezier(0, 0, 1, 1); cursor: pointer; margin: 0px 0px 0px 8px; font-family: UberMove, UberMoveText, system-ui, "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: calc(0.75rem); line-height: 1rem; font-weight: 500; letter-spacing: 0.33px; border-radius: 999px; padding: 6px 8px; color: rgb(17, 17, 17); background-color: rgb(246, 246, 246); }
+._css-fbBTWH:disabled { cursor: not-allowed; background-color: rgba(224, 224, 224, 0.6); color: rgb(196, 196, 196); }
+._css-fbBTWH:focus-visible { box-shadow: rgb(252, 252, 252) 0px 0px 0px 2px inset, rgb(39, 110, 241) 0px 0px 0px 2px; }
+._css-fbBTWH:hover { box-shadow: rgba(17, 17, 17, 0.06) 999px 999px 0px inset; }
+._css-fbBTWH:active { box-shadow: rgba(17, 17, 17, 0.1) 999px 999px 0px inset; }
+._css-cHHvFN { background-image: url("https://d1a3f4spazzrp4.cloudfront.net/car-types/haloProductImages/Regular/Sedan-160-0.png"); background-size: cover; background-position: center center; width: 100px; order: 0; align-self: center; border-radius: 12px; flex-shrink: 0; margin: 12px 0px 12px 12px; height: 100px; }
+._css-eqRTOQ { background-image: url("https://d1a3f4spazzrp4.cloudfront.net/car-types/haloProductImages/Regular/Sedan-Lightning-166-0.png"); background-size: cover; background-position: center center; width: 100px; order: 0; align-self: center; border-radius: 12px; flex-shrink: 0; margin: 12px 0px 12px 12px; height: 100px; }
+._css-hwEvcr { display: flex; -webkit-box-orient: horizontal; -webkit-box-direction: normal; flex-direction: row; -webkit-box-pack: end; justify-content: flex-end; padding-top: 32px; }

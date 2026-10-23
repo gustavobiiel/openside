@@ -3,6 +3,7 @@
 'use client';
 
 import {useState, type CSSProperties} from 'react';
+import CartaoAssinatura from '../coleta-expedicao/CartaoAssinatura';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {
   VStack,
@@ -66,23 +67,24 @@ const sideNavHeading: CSSProperties = {
 };
 
 const NAV_ITEMS = [
-  {label: 'Personal information', icon: UserIcon},
-  {label: 'Login & security', icon: LockClosedIcon},
-  {label: 'Privacy', icon: ShieldCheckIcon},
-  {label: 'Notifications', icon: BellIcon},
-  {label: 'Taxes', icon: DocumentTextIcon},
-  {label: 'Payments', icon: CreditCardIcon},
-  {label: 'Languages & currency', icon: GlobeAltIcon},
-  {label: 'Travel for work', icon: BriefcaseIcon},
+  {label: 'Informações pessoais', icon: UserIcon},
+  {label: 'Assinaturas', icon: PencilSquareIcon},
+  {label: 'Login e segurança', icon: LockClosedIcon},
+  {label: 'Privacidade', icon: ShieldCheckIcon},
+  {label: 'Notificações', icon: BellIcon},
+  {label: 'Impostos', icon: DocumentTextIcon},
+  {label: 'Pagamentos', icon: CreditCardIcon},
+  {label: 'Idioma e moeda', icon: GlobeAltIcon},
+  {label: 'Viagens a trabalho', icon: BriefcaseIcon},
 ];
 
 // Section title shown beside the mobile back button (matches each section's
 // in-content heading, which is hidden on mobile to avoid a duplicate).
 const SECTION_TITLES: Record<string, string> = {
-  'Personal information': 'Personal info',
-  'Login & security': 'Login & security',
-  Privacy: 'Privacy',
-  'Languages & currency': 'Languages & currency',
+  'Informações pessoais': 'Informações pessoais',
+  'Login e segurança': 'Login e segurança',
+  Privacidade: 'Privacidade',
+  'Idioma e moeda': 'Idioma e moeda',
 };
 
 interface InfoRow {
@@ -92,11 +94,11 @@ interface InfoRow {
 }
 
 const LOGIN_ROWS: InfoRow[] = [
-  {label: 'Password', value: 'Not created', action: 'Create'},
+  {label: 'Senha', value: 'Não criada', action: 'Criar'},
 ];
 
 const SOCIAL_ROWS: InfoRow[] = [
-  {label: 'Google', value: 'Connected', action: 'Disconnect'},
+  {label: 'Google', value: 'Conectado', action: 'Desconectar'},
 ];
 
 const DEVICE_ROWS: {
@@ -107,14 +109,14 @@ const DEVICE_ROWS: {
 }[] = [
   {
     label: 'OS X 10.15.7 · Chrome',
-    badge: 'CURRENT SESSION',
-    location: 'McKinney, Texas · March 30, 2026 at 19:31',
+    badge: 'SESSÃO ATUAL',
+    location: 'McKinney, Texas · 30 de março de 2026 às 19:31',
   },
-  {label: 'Session', location: 'August 9, 2023 at 04:19', action: 'Log out'},
+  {label: 'Sessão', location: '9 de agosto de 2023 às 04:19', action: 'Sair'},
   {
-    label: 'OS X 10.15.7 · unknown',
-    location: 'Sunnyvale, California · April 14, 2023 at 17:47',
-    action: 'Log out',
+    label: 'OS X 10.15.7 · desconhecido',
+    location: 'Sunnyvale, Califórnia · 14 de abril de 2023 às 17:47',
+    action: 'Sair',
   },
 ];
 
@@ -165,8 +167,8 @@ function ExpandableRow({
           </Text>
           {children}
           <HStack gap={2}>
-            <Button label="Save" variant="primary" onClick={onSave} />
-            <Button label="Cancel" variant="ghost" onClick={onCancel} />
+            <Button label="Salvar" variant="primary" onClick={onSave} />
+            <Button label="Cancelar" variant="ghost" onClick={onCancel} />
           </HStack>
         </VStack>
       ) : (
@@ -185,7 +187,7 @@ function ExpandableRow({
               e.preventDefault();
               onEdit();
             }}>
-            Edit
+            Editar
           </Link>
         </HStack>
       )}
@@ -195,29 +197,29 @@ function ExpandableRow({
 }
 
 const LANGUAGES = [
-  {label: 'English (Canada)', value: 'en-CA'},
-  {label: 'English (US)', value: 'en-US'},
-  {label: 'French', value: 'fr'},
-  {label: 'Spanish', value: 'es'},
-  {label: 'German', value: 'de'},
-  {label: 'Japanese', value: 'ja'},
+  {label: 'Inglês (Canadá)', value: 'en-CA'},
+  {label: 'Inglês (EUA)', value: 'en-US'},
+  {label: 'Francês', value: 'fr'},
+  {label: 'Espanhol', value: 'es'},
+  {label: 'Alemão', value: 'de'},
+  {label: 'Japonês', value: 'ja'},
 ];
 
 const CURRENCIES = [
-  {label: 'Canadian dollar (CAD)', value: 'CAD'},
-  {label: 'US dollar (USD)', value: 'USD'},
+  {label: 'Dólar canadense (CAD)', value: 'CAD'},
+  {label: 'Dólar americano (USD)', value: 'USD'},
   {label: 'Euro (EUR)', value: 'EUR'},
-  {label: 'British pound (GBP)', value: 'GBP'},
-  {label: 'Japanese yen (JPY)', value: 'JPY'},
+  {label: 'Libra esterlina (GBP)', value: 'GBP'},
+  {label: 'Iene japonês (JPY)', value: 'JPY'},
 ];
 
 const TIMEZONES = [
-  {label: '(GMT-05:00) Eastern Time (US & Canada)', value: 'ET'},
-  {label: '(GMT-06:00) Central Time (US & Canada)', value: 'CT'},
-  {label: '(GMT-07:00) Mountain Time (US & Canada)', value: 'MT'},
-  {label: '(GMT-08:00) Pacific Time (US & Canada)', value: 'PT'},
+  {label: '(GMT-05:00) Horário do Leste (EUA e Canadá)', value: 'ET'},
+  {label: '(GMT-06:00) Horário Central (EUA e Canadá)', value: 'CT'},
+  {label: '(GMT-07:00) Horário das Montanhas (EUA e Canadá)', value: 'MT'},
+  {label: '(GMT-08:00) Horário do Pacífico (EUA e Canadá)', value: 'PT'},
   {label: '(GMT+00:00) UTC', value: 'UTC'},
-  {label: '(GMT+01:00) London', value: 'GMT+1'},
+  {label: '(GMT+01:00) Londres', value: 'GMT+1'},
 ];
 
 export default function SettingsSecurityTemplate() {
@@ -225,7 +227,7 @@ export default function SettingsSecurityTemplate() {
   // Mobile is a master→detail drill-down: 'nav' shows the menu, 'detail' shows
   // the selected section with a back button. Desktop shows both side-by-side.
   const [mobileView, setMobileView] = useState<'nav' | 'detail'>('nav');
-  const [activeNav, setActiveNav] = useState('Personal information');
+  const [activeNav, setActiveNav] = useState('Informações pessoais');
   const [activeTab, setActiveTab] = useState('login');
   const [readReceipts, setReadReceipts] = useState(true);
   const [searchEngines, setSearchEngines] = useState(true);
@@ -236,6 +238,7 @@ export default function SettingsSecurityTemplate() {
   const [aiFeatures, setAiFeatures] = useState(true);
 
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [assinaturaAberta, setAssinaturaAberta] = useState(false);
   const [language, setLanguage] = useState('en-CA');
   const [currency, setCurrency] = useState('CAD');
   const [timezone, setTimezone] = useState('ET');
@@ -246,7 +249,7 @@ export default function SettingsSecurityTemplate() {
   const [phone, setPhone] = useState('+1 ***-***-0123');
   const [address, setAddress] = useState('');
   const [mailingAddress, setMailingAddress] = useState('');
-  const [emergencyContact, setEmergencyContact] = useState('Provided');
+  const [emergencyContact, setEmergencyContact] = useState('Informado');
 
   // Selecting a nav item also drills into the detail view on mobile.
   const selectNav = (label: string) => {
@@ -257,7 +260,7 @@ export default function SettingsSecurityTemplate() {
   const navList = (
     <VStack gap={4} style={sideNavPadding}>
       <Heading level={2} style={sideNavHeading}>
-        Account settings
+        Configurações da conta
       </Heading>
       <List density="spacious">
         {NAV_ITEMS.map(item => (
@@ -271,14 +274,20 @@ export default function SettingsSecurityTemplate() {
               ) : undefined
             }
             isSelected={!isNarrow && activeNav === item.label}
-            onClick={() => selectNav(item.label)}
+            onClick={() => {
+              if (item.label === 'Assinaturas') {
+                setAssinaturaAberta(true);
+                return;
+              }
+              selectNav(item.label);
+            }}
           />
         ))}
       </List>
       <Divider />
       <List density="spacious">
         <ListItem
-          label="Professional hosting tools"
+          label="Ferramentas profissionais"
           startContent={<Icon icon={WrenchScrewdriverIcon} />}
           onClick={() => {}}
         />
@@ -289,15 +298,19 @@ export default function SettingsSecurityTemplate() {
   // Mobile, nav view: show only the menu (full width, no sidebar slot).
   if (isNarrow && mobileView === 'nav') {
     return (
-      <Layout
-        height="fill"
-        style={fillViewport}
-        content={<LayoutContent padding={2}>{navList}</LayoutContent>}
-      />
+      <>
+        <Layout
+          height="fill"
+          style={fillViewport}
+          content={<LayoutContent padding={2}>{navList}</LayoutContent>}
+        />
+        {assinaturaAberta ? <CartaoAssinatura onFechar={() => setAssinaturaAberta(false)} /> : null}
+      </>
     );
   }
 
   return (
+    <>
     <Layout
       height="fill"
       contentWidth={1200}
@@ -318,12 +331,12 @@ export default function SettingsSecurityTemplate() {
                 flush with the content edge. */}
             {isNarrow && (
               <Toolbar
-                label={`Back to Account settings — ${SECTION_TITLES[activeNav]}`}
+                label={`Voltar às configurações da conta — ${SECTION_TITLES[activeNav]}`}
                 gap={2}
                 startContent={
                   <>
                     <Button
-                      label="Back to Account settings"
+                      label="Voltar às configurações da conta"
                       variant="ghost"
                       size="sm"
                       isIconOnly
@@ -335,19 +348,19 @@ export default function SettingsSecurityTemplate() {
                 }
               />
             )}
-            {activeNav === 'Login & security' && (
+            {activeNav === 'Login e segurança' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Login &amp; security</Heading>}
+                {!isNarrow && <Heading level={2}>Login e segurança</Heading>}
 
                 <TabList value={activeTab} onChange={setActiveTab} hasDivider>
-                  <Tab value="login" label="Login" />
-                  <Tab value="shared" label="Shared access" />
+                  <Tab value="login" label="Entrada" />
+                  <Tab value="shared" label="Acesso compartilhado" />
                 </TabList>
 
                 {activeTab === 'login' && (
                   <VStack gap={8}>
                     <VStack gap={0}>
-                      <Heading level={3}>Login</Heading>
+                      <Heading level={3}>Entrada</Heading>
                       <Divider />
                       {LOGIN_ROWS.map(row => (
                         <InfoRowItem key={row.label} {...row} />
@@ -355,7 +368,7 @@ export default function SettingsSecurityTemplate() {
                     </VStack>
 
                     <VStack gap={0}>
-                      <Heading level={3}>Social accounts</Heading>
+                      <Heading level={3}>Contas conectadas</Heading>
                       <Divider />
                       {SOCIAL_ROWS.map(row => (
                         <InfoRowItem key={row.label} {...row} />
@@ -363,7 +376,7 @@ export default function SettingsSecurityTemplate() {
                     </VStack>
 
                     <VStack gap={0}>
-                      <Heading level={3}>Device history</Heading>
+                      <Heading level={3}>Histórico de dispositivos</Heading>
                       <Divider />
                       {DEVICE_ROWS.map((device, i) => (
                         <HStack
@@ -397,7 +410,7 @@ export default function SettingsSecurityTemplate() {
                     </VStack>
 
                     <VStack gap={0}>
-                      <Heading level={3}>Account</Heading>
+                      <Heading level={3}>Conta</Heading>
                       <Divider />
                       <HStack
                         hAlign="between"
@@ -405,16 +418,16 @@ export default function SettingsSecurityTemplate() {
                         style={rowPadding}>
                         <VStack gap={0}>
                           <Text type="body" weight="semibold" display="block">
-                            Deactivate your account
+                            Desativar sua conta
                           </Text>
                           <Text
                             type="supporting"
                             color="secondary"
                             display="block">
-                            This action cannot be undone
+                            Esta ação não pode ser desfeita
                           </Text>
                         </VStack>
-                        <Link href="#">Deactivate</Link>
+                        <Link href="#">Desativar</Link>
                       </HStack>
                       <Divider />
                     </VStack>
@@ -424,13 +437,12 @@ export default function SettingsSecurityTemplate() {
                 {activeTab === 'shared' && (
                   <VStack gap={8}>
                     <VStack gap={2}>
-                      <Heading level={3}>Shared access</Heading>
+                      <Heading level={3}>Acesso compartilhado</Heading>
                       <Divider />
                       <Text type="body" color="secondary">
-                        Review each request carefully before approving access.
-                        We&apos;ll email your employee or co-worker a 4-digit
-                        code that lets them log into your account with their
-                        trusted device.
+                        Analise cada pedido com cuidado antes de aprovar o acesso.
+                        Enviaremos um código de 4 dígitos para o colega entrar
+                        na sua conta a partir de um dispositivo confiável.
                       </Text>
                     </VStack>
 
@@ -441,13 +453,12 @@ export default function SettingsSecurityTemplate() {
                         </Center>
                         <VStack gap={1}>
                           <Text type="body" weight="bold">
-                            Adding devices from people you trust
+                            Adicionar dispositivos de pessoas de confiança
                           </Text>
                           <Text type="body" color="secondary">
-                            When you approve a request, you grant someone full
-                            access to your account. They&apos;ll be able to
-                            change reservations and send messages on your
-                            behalf.
+                            Ao aprovar um pedido, você concede acesso total à sua
+                            conta. A pessoa poderá alterar reservas e enviar
+                            mensagens em seu nome.
                           </Text>
                         </VStack>
                       </HStack>
@@ -457,14 +468,14 @@ export default function SettingsSecurityTemplate() {
               </VStack>
             )}
 
-            {activeNav === 'Languages & currency' && (
+            {activeNav === 'Idioma e moeda' && (
               <VStack gap={6}>
                 {!isNarrow && (
-                  <Heading level={2}>Languages &amp; currency</Heading>
+                  <Heading level={2}>Idioma e moeda</Heading>
                 )}
                 <VStack gap={0}>
                   <ExpandableRow
-                    label="Preferred language"
+                    label="Idioma preferido"
                     value={
                       LANGUAGES.find(l => l.value === language)?.label ??
                       language
@@ -474,7 +485,7 @@ export default function SettingsSecurityTemplate() {
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <Selector
-                      label="Language"
+                      label="Idioma"
                       isLabelHidden
                       size="lg"
                       value={language}
@@ -483,7 +494,7 @@ export default function SettingsSecurityTemplate() {
                     />
                   </ExpandableRow>
                   <ExpandableRow
-                    label="Preferred currency"
+                    label="Moeda preferida"
                     value={
                       CURRENCIES.find(c => c.value === currency)?.label ??
                       currency
@@ -493,7 +504,7 @@ export default function SettingsSecurityTemplate() {
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <Selector
-                      label="Currency"
+                      label="Moeda"
                       isLabelHidden
                       size="lg"
                       value={currency}
@@ -502,7 +513,7 @@ export default function SettingsSecurityTemplate() {
                     />
                   </ExpandableRow>
                   <ExpandableRow
-                    label="Time zone"
+                    label="Fuso horário"
                     value={
                       TIMEZONES.find(t => t.value === timezone)?.label ??
                       timezone
@@ -512,7 +523,7 @@ export default function SettingsSecurityTemplate() {
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <Selector
-                      label="Time zone"
+                      label="Fuso horário"
                       isLabelHidden
                       size="lg"
                       value={timezone}
@@ -524,108 +535,108 @@ export default function SettingsSecurityTemplate() {
               </VStack>
             )}
 
-            {activeNav === 'Personal information' && (
+            {activeNav === 'Informações pessoais' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Personal info</Heading>}
+                {!isNarrow && <Heading level={2}>Informações pessoais</Heading>}
                 <VStack gap={0}>
                   <ExpandableRow
-                    label="Legal name"
+                    label="Nome completo"
                     value={legalName}
                     isExpanded={expandedRow === 'legalName'}
                     onEdit={() => setExpandedRow('legalName')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <TextInput
-                      label="Legal name"
+                      label="Nome completo"
                       isLabelHidden
                       value={legalName}
                       onChange={setLegalName}
                     />
                   </ExpandableRow>
                   <ExpandableRow
-                    label="Preferred first name"
-                    value={preferredName || 'Not provided'}
+                    label="Nome de preferência"
+                    value={preferredName || 'Não informado'}
                     isExpanded={expandedRow === 'preferredName'}
                     onEdit={() => setExpandedRow('preferredName')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <TextInput
-                      label="Preferred first name"
+                      label="Nome de preferência"
                       isLabelHidden
                       value={preferredName}
                       onChange={setPreferredName}
                     />
                   </ExpandableRow>
                   <ExpandableRow
-                    label="Email address"
+                    label="E-mail"
                     value={email}
                     isExpanded={expandedRow === 'email'}
                     onEdit={() => setExpandedRow('email')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <TextInput
-                      label="Email address"
+                      label="E-mail"
                       isLabelHidden
                       value={email}
                       onChange={setEmail}
                     />
                   </ExpandableRow>
                   <ExpandableRow
-                    label="Phone number"
+                    label="Telefone"
                     value={phone}
                     isExpanded={expandedRow === 'phone'}
                     onEdit={() => setExpandedRow('phone')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <TextInput
-                      label="Phone number"
+                      label="Telefone"
                       isLabelHidden
                       value={phone}
                       onChange={setPhone}
                     />
                   </ExpandableRow>
                   <InfoRowItem
-                    label="Identity verification"
-                    value="Verified"
+                    label="Verificação de identidade"
+                    value="Verificada"
                     action=""
                   />
                   <ExpandableRow
-                    label="Residential address"
-                    value={address || 'Not provided'}
+                    label="Endereço residencial"
+                    value={address || 'Não informado'}
                     isExpanded={expandedRow === 'address'}
                     onEdit={() => setExpandedRow('address')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <TextInput
-                      label="Residential address"
+                      label="Endereço residencial"
                       isLabelHidden
                       value={address}
                       onChange={setAddress}
                     />
                   </ExpandableRow>
                   <ExpandableRow
-                    label="Mailing address"
-                    value={mailingAddress || 'Not provided'}
+                    label="Endereço de correspondência"
+                    value={mailingAddress || 'Não informado'}
                     isExpanded={expandedRow === 'mailingAddress'}
                     onEdit={() => setExpandedRow('mailingAddress')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <TextInput
-                      label="Mailing address"
+                      label="Endereço de correspondência"
                       isLabelHidden
                       value={mailingAddress}
                       onChange={setMailingAddress}
                     />
                   </ExpandableRow>
                   <ExpandableRow
-                    label="Emergency contact"
+                    label="Contato de emergência"
                     value={emergencyContact}
                     isExpanded={expandedRow === 'emergencyContact'}
                     onEdit={() => setExpandedRow('emergencyContact')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}>
                     <TextInput
-                      label="Emergency contact"
+                      label="Contato de emergência"
                       isLabelHidden
                       value={emergencyContact}
                       onChange={setEmergencyContact}
@@ -641,14 +652,14 @@ export default function SettingsSecurityTemplate() {
                       </Center>
                       <VStack gap={0}>
                         <Text type="body" weight="semibold" display="block">
-                          Why isn&apos;t my info shown here?
+                          Por que minhas informações não aparecem aqui?
                         </Text>
                         <Text
                           type="supporting"
                           color="secondary"
                           display="block">
-                          We&apos;re hiding some account details to protect your
-                          identity.
+                          Ocultamos alguns dados da conta para proteger sua
+                          identidade.
                         </Text>
                       </VStack>
                     </HStack>
@@ -659,16 +670,16 @@ export default function SettingsSecurityTemplate() {
                       </Center>
                       <VStack gap={0}>
                         <Text type="body" weight="semibold" display="block">
-                          Which details can be edited?
+                          Quais dados podem ser editados?
                         </Text>
                         <Text
                           type="supporting"
                           color="secondary"
                           display="block">
-                          Contact info and personal details can be edited. If
-                          this info was used to verify your identity,
-                          you&apos;ll need to get verified again the next time
-                          you book—or to continue hosting.
+                          Dados de contato e informações pessoais podem ser editados. Se
+                          esses dados serviram para verificar sua identidade,
+                          será preciso verificar de novo na próxima reserva —
+                          ou para continuar hospedando.
                         </Text>
                       </VStack>
                     </HStack>
@@ -679,14 +690,14 @@ export default function SettingsSecurityTemplate() {
                       </Center>
                       <VStack gap={0}>
                         <Text type="body" weight="semibold" display="block">
-                          What info is shared with others?
+                          Quais informações são compartilhadas?
                         </Text>
                         <Text
                           type="supporting"
                           color="secondary"
                           display="block">
-                          We only release contact information after a
-                          reservation is confirmed.
+                          Só liberamos dados de contato depois que a
+                          reserva é confirmada.
                         </Text>
                       </VStack>
                     </HStack>
@@ -695,16 +706,16 @@ export default function SettingsSecurityTemplate() {
               </VStack>
             )}
 
-            {activeNav === 'Privacy' && (
+            {activeNav === 'Privacidade' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Privacy</Heading>}
+                {!isNarrow && <Heading level={2}>Privacidade</Heading>}
 
                 <VStack gap={8}>
                   <VStack gap={0}>
-                    <Heading level={3}>Messages</Heading>
+                    <Heading level={3}>Mensagens</Heading>
                     <VStack style={rowPadding}>
                       <Switch
-                        label="Show people when I've read their messages."
+                        label="Mostrar quando eu li as mensagens."
                         value={readReceipts}
                         onChange={setReadReceipts}
                         labelPosition="start"
@@ -713,19 +724,19 @@ export default function SettingsSecurityTemplate() {
                     </VStack>
                     <HStack hAlign="between" vAlign="center" style={rowPadding}>
                       <Text type="body" weight="semibold">
-                        Blocked people
+                        Pessoas bloqueadas
                       </Text>
-                      <Link href="#">View</Link>
+                      <Link href="#">Ver</Link>
                     </HStack>
                     <Divider />
                   </VStack>
 
                   <VStack gap={0}>
-                    <Heading level={3}>Listings</Heading>
+                    <Heading level={3}>Anúncios</Heading>
                     <VStack style={rowPadding}>
                       <Switch
-                        label="Include my listing(s) in search engines"
-                        description="Turning this on means search engines, like Google, will display your listing page(s) in search results."
+                        label="Incluir meus anúncios em mecanismos de busca"
+                        description="Com isso ligado, mecanismos de busca, como o Google, mostram suas páginas de anúncio nos resultados."
                         value={searchEngines}
                         onChange={setSearchEngines}
                         labelPosition="start"
@@ -736,41 +747,41 @@ export default function SettingsSecurityTemplate() {
                   </VStack>
 
                   <VStack gap={4}>
-                    <Heading level={3}>Reviews</Heading>
+                    <Heading level={3}>Avaliações</Heading>
                     <Text type="supporting" color="secondary">
-                      Choose what&apos;s shared when you write a review.{' '}
+                      Escolha o que é compartilhado quando você escreve uma avaliação.{' '}
                       <Link href="#" type="supporting">
-                        Learn more
+                        Saiba mais
                       </Link>
                     </Text>
                     <VStack gap={4}>
                       <Switch
-                        label="Show my home city and country"
-                        description="Ex: City and country"
+                        label="Mostrar minha cidade e meu país"
+                        description="Ex.: cidade e país"
                         value={showCity}
                         onChange={setShowCity}
                         labelPosition="start"
                         labelSpacing="spread"
                       />
                       <Switch
-                        label="Show my trip type"
-                        description="Ex: Stayed with kids or pets"
+                        label="Mostrar o tipo de viagem"
+                        description="Ex.: ficou com crianças ou pets"
                         value={showTripType}
                         onChange={setShowTripType}
                         labelPosition="start"
                         labelSpacing="spread"
                       />
                       <Switch
-                        label="Show my length of stay"
-                        description="Ex: A few nights, about a week, etc."
+                        label="Mostrar a duração da estadia"
+                        description="Ex.: algumas noites, cerca de uma semana"
                         value={showStayLength}
                         onChange={setShowStayLength}
                         labelPosition="start"
                         labelSpacing="spread"
                       />
                       <Switch
-                        label="Show my booked services"
-                        description="Ex: Gourmet brunch or tasting menu"
+                        label="Mostrar os serviços reservados"
+                        description="Ex.: brunch ou menu degustação"
                         value={showServices}
                         onChange={setShowServices}
                         labelPosition="start"
@@ -781,16 +792,16 @@ export default function SettingsSecurityTemplate() {
                   </VStack>
 
                   <VStack gap={4}>
-                    <Heading level={3}>Data privacy</Heading>
+                    <Heading level={3}>Privacidade dos dados</Heading>
                     <Card>
                       <HStack hAlign="between" vAlign="center">
-                        <Text type="body">Request my personal data</Text>
-                        <Link href="#">Request</Link>
+                        <Text type="body">Solicitar meus dados pessoais</Text>
+                        <Link href="#">Solicitar</Link>
                       </HStack>
                     </Card>
                     <Switch
-                      label="Help improve AI-powered features"
-                      description="When this is on, we use your data to develop and improve AI models."
+                      label="Ajudar a melhorar recursos com IA"
+                      description="Com isso ligado, usamos seus dados para desenvolver e melhorar modelos de IA."
                       value={aiFeatures}
                       onChange={setAiFeatures}
                       labelPosition="start"
@@ -798,8 +809,8 @@ export default function SettingsSecurityTemplate() {
                     />
                     <Card>
                       <HStack hAlign="between" vAlign="center">
-                        <Text type="body">Delete my account</Text>
-                        <Link href="#">Delete</Link>
+                        <Text type="body">Excluir minha conta</Text>
+                        <Link href="#">Excluir</Link>
                       </HStack>
                     </Card>
                     <Card variant="muted">
@@ -809,13 +820,13 @@ export default function SettingsSecurityTemplate() {
                         </Center>
                         <VStack gap={1}>
                           <Text type="body" weight="bold">
-                            Committed to privacy
+                            Compromisso com a privacidade
                           </Text>
                           <Text type="supporting" color="secondary">
-                            We&apos;re committed to keeping your data protected.
-                            See details in our{' '}
+                            Mantemos seus dados protegidos.
+                            Veja os detalhes na nossa{' '}
                             <Link href="#" type="supporting">
-                              Privacy Policy
+                              Política de Privacidade
                             </Link>
                             .
                           </Text>
@@ -830,5 +841,7 @@ export default function SettingsSecurityTemplate() {
         </LayoutContent>
       }
     />
+    {assinaturaAberta ? <CartaoAssinatura onFechar={() => setAssinaturaAberta(false)} /> : null}
+    </>
   );
 }
